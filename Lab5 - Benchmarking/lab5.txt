@@ -1,0 +1,77 @@
+# # # # #
+# -------
+# Part 0:
+# -------
+# # # # # 
+
+- Benchmarks (us):
+------------------
+retZero: 0.76, 0.76, 0.76
+writeOnePin: 3.42, 3.42, 3.42
+writeManyPins: 24.49, 24.49, 24.49
+digitalWrite6Table: 30.65, 30.65, 30.65
+writePorts: 0.82, 0.82, 0.82
+digitalReadPin: 3.36, 3.36, 3.36
+readPorts: 0.89, 0.89, 0.89 (return PINB)
+analogReadPin: 112.001, 112.00, 112.00
+------------------
+
+- Discuss:
+------------------
+a. They barely very at all, even comparing our results to each other they are identical.
+b. It seems to be farely linear, a 7x increase in time for a 6x increase in calls. I don't think that the 
+   empty test explains it, since whatever overhead there is for 1 call should just be multiplied by 6 for 6 calls, 
+   assuming that the overhead is constant, it wouldn't create non-linearity in performance cost.
+c. The table of pins added slightly to the performance cost, about 1 us per pin entry. This would probably be worth 
+   it in most situations where you have to work with many pins (such as with the seven segment display) for the    
+   added tidiness and easier maintance. (This was with the table in the function - It's basically the same as 
+   individual calls when put outside of it).
+d. There is only a 30x increase in performance for writing directly to the PORT, hardly worth writing in binary! 
+   But that would be necessary in any situation where you need several pins activated or deactivated at exactly the 
+   same time.
+------------------
+
+# # # # #
+# -------
+# Part 1:
+# -------
+# # # # # 
+
+- Benchmarks (us):
+------------------
+delayMicroseconds1: 0.76, 0.76, 0.76 (using delay gave 7.14, 7.14, 7.14)
+delayMicroseconds10: 9.59, 9.59, 9.59 (using delay gave 7.14, 7.14, 7.14)
+delayMilliseconds1: 1008.10, 1008.08, 1008.09
+------------------
+
+- Discuss:
+------------------
+a. 1us: 24%, 10us: 4%, 1ms: 0.8%
+b. It seems that there is enough relative time error such that if you need something accurate within a single
+   microsecond, you are likely to have issues.
+------------------
+
+# # # # #
+# -------
+# Part 2:
+# -------
+# # # # #
+
+- Benchmarks (us):
+------------------
+andInt: 0.89, 0.89, 0.89
+addInt: 0.89, 0.89, 0.89
+mulInt: 1.08, 1.08, 1.08
+divInt: 14.36, 14.36, 14.36
+addFloat: 16.29, 16.29, 16.29
+serialPrint: 1007.28, 1007.28, 1007.28
+------------------
+
+- Discuss:
+------------------
+a. In our tests, they seem to be the same. They also do not seem to depend on the values involved at all.
+b. Adding two floats is approximately 18x slower than adding two ints.
+c. Arduino does division using software, rather than hardware.
+ - In fact, the arduino does all floating point operations in software.
+d. It has to load a buffer and then send that.
+------------------
