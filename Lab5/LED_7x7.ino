@@ -38,7 +38,7 @@ uint8_t shiftPin  = 2; // SRCLK -- ⚠ Change me if yours is different ⚠
 
 const uint8_t nhardwire   = 8;
 const uint8_t nshift_bits = 8;
-const uint8_t h_pins[nhardwire  ] = {12,11,10, 9, 8, 7, 6, 5}; // ⚠ Change me if yours is different ⚠
+const uint8_t h_pins[nhardwire  ] = {12,11,10, 9, 8, 7, 6, 5}; // -- ⚠ Change me if yours is different ⚠
 const rc_t    rch   [nhardwire  ] = {r4,r6,c1,c2,r7,c4,r5,r2};
 const rc_t    rcs   [nshift_bits] = {c7,c6,r1,c0,r3,c5,c3,r0};
 
@@ -46,22 +46,22 @@ const rc_t    rcs   [nshift_bits] = {c7,c6,r1,c0,r3,c5,c3,r0};
 const int nbits=16;
 const uint8_t rc_and_pin_at_bit[nbits][3]=
 {
-  {0,         4, rcs[3]},  // c0
-  {1, h_pins[2], rch[2]},  // c1
-  {1, h_pins[3], rch[3]},  // c2
-  {0,         1, rcs[6]},  // c3
-  {1, h_pins[5], rch[5]},  // c4
-  {0,         2, rcs[5]},  // c5
-  {0,         6, rcs[1]},  // c6
-  {0,         7, rcs[0]},  // c7
-  {0,         0, rcs[7]},  // r0
-  {0,         5, rcs[2]},  // r1
-  {1, h_pins[7], rch[7]},  // r2
-  {0,         3, rcs[4]},  // r3
-  {1, h_pins[0], rch[0]},  // r4
-  {1, h_pins[6], rch[6]},  // r5
-  {1, h_pins[1], rch[1]},  // r6
-  {1, h_pins[4], rch[4]}   // r7
+  {0,         4, rcs[3]},  // -- C0
+  {1, h_pins[2], rch[2]},  // -- C1
+  {1, h_pins[3], rch[3]},  // -- C2
+  {0,         1, rcs[6]},  // -- C3
+  {1, h_pins[5], rch[5]},  // -- C4
+  {0,         2, rcs[5]},  // -- C5
+  {0,         6, rcs[1]},  // -- C6
+  {0,         7, rcs[0]},  // -- C7
+  {0,         0, rcs[7]},  // -- R0
+  {0,         5, rcs[2]},  // -- R1
+  {1, h_pins[7], rch[7]},  // -- R2
+  {0,         3, rcs[4]},  // -- R3
+  {1, h_pins[0], rch[0]},  // -- R4
+  {1, h_pins[6], rch[6]},  // -- R5
+  {1, h_pins[1], rch[1]},  // -- R6
+  {1, h_pins[4], rch[4]}   // -- R7
 };
 
 
@@ -98,9 +98,11 @@ const int npatterns=6 + 8 + 8;
 LED_rc_bits_t patterns[npatterns] =
 {
 
-  //ON:0   ON:1
-  //ROW    COL 
-  //7654321076543210
+  /*------------------
+    ROW    COL
+    ON: 0  ON: 1   
+    7654321076543210
+  ------------------*/
 
   0b1111111100000000, // All LEDs OFF
   0b0000000011111111, // All LEDs ON
@@ -109,7 +111,7 @@ LED_rc_bits_t patterns[npatterns] =
   0b1101101100100100, // Corner Inset-2
   0b1110011100011000, // Center 4
 
-  0b0000000010000000, // Right-to-left Col Scan (Dark Background)
+  0b0000000010000000, // Right-to-left Col Scan
   0b0000000001000000,
   0b0000000000100000,
   0b0000000000010000,
@@ -118,7 +120,7 @@ LED_rc_bits_t patterns[npatterns] =
   0b0000000000000010,
   0b0000000000000001,
 
-  0b0111111111111111, // Bottom-to-top Row Scan (Dark Background)
+  0b0111111111111111, // Bottom-to-top Row Scan
   0b1011111111111111,
   0b1101111111111111,
   0b1110111111111111,
