@@ -94,7 +94,7 @@ inline bool get_rc_bit(LED_rc_bits_t rc_bits, rc_t bit)
 }
 
 
-const int npatterns=6 + 8 + 8;
+const int    npatterns=6 + 8 + 8;
 LED_rc_bits_t patterns[npatterns] =
 {
 
