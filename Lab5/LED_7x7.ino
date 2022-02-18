@@ -42,7 +42,12 @@ const uint8_t h_pins[nhardwire  ] = {12,11,10, 9, 8, 7, 6, 5}; // -- ⚠ Change 
 const rc_t    rch   [nhardwire  ] = {r4,r6,c1,c2,r7,c4,r5,r2};
 const rc_t    rcs   [nshift_bits] = {c7,c6,r1,c0,r3,c5,c3,r0};
 
-
+/*/
+ * Table for getting three things:
+ * 1. Whether an bit position value goes to a hardware pin, or not.
+ * 2. If hardwear, the pin is given; else the left shift amount is given (position from the right in rcs).
+ * 3. The rc value for that bit position.
+/*/
 const int nbits=16;
 const uint8_t rc_and_pin_at_bit[nbits][3]=
 {
