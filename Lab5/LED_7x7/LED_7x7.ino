@@ -49,7 +49,7 @@ const uint8_t rcs   [nshift_bits] = {c7, c6, r1, c0, r3, c5, c3, r0};
  * 3. The rc value for that bit position.
 /*/
 const uint8_t nbits = 16;
-const uint8_t rc_and_pin_at_bit[nbits][3] =
+const uint8_t ishardware_pin_and_rc_at_bit[nbits][3] =
 {
   {0,         4, rcs[3]},  // -- C0
   {1, h_pins[2], rch[2]},  // -- C1
@@ -181,16 +181,16 @@ void showPattern(const LED_rc_bits_t& pattern)
   {
     for (uint8_t i = 2; i > 0; i--) 
     {
-      const uint8_t  rc                       = (2 * i * 4) - 1 - b;
-      const uint8_t *isnotshiftreg_pin_and_rc = rc_and_pin_at_bit[rc];
+      const uint8_t  rc                    = (2 * i * 4) - 1 - b;
+      const uint8_t *ishardware_pin_and_rc = ishardware_pin_and_rc_at_bit[rc];
 
-      const uint8_t pin              = isnotshiftreg_pin_and_rc[1];  
-      const uint8_t rc_val           = isnotshiftreg_pin_and_rc[2];
-      const bool    not_in_shift_reg = isnotshiftreg_pin_and_rc[0];
-      const bool    bit              = get_rc_bit(pattern, rc_val);
+      const uint8_t  pin         = ishardware_pin_and_rc[1];  
+      const uint8_t  rc_val      = ishardware_pin_and_rc[2];
+      const bool     is_hardware = ishardware_pin_and_rc[0];
+      const bool     bit         = get_rc_bit(pattern, rc_val);
 
       /* Set the values using port if this row/column goes directly to the pins. */
-      if (not_in_shift_reg)
+      if (is_hardware)
       {
         const uint8_t port_position = port_positions[pin];
  
