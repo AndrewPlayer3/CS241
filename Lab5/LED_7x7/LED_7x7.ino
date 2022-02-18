@@ -8,7 +8,7 @@
 enum : uint8_t
 { 
 
-  // Columns = 0 -> 7
+  // Cols = 0 -> 7
   c0=0,
   c1,
   c2,
@@ -157,8 +157,8 @@ void sendByte(const uint8_t& data)
   {
     bool sendBit = data & (1 << b);
 
-    if(sendBit) digitalWrite(dataPin, 1);
-    else        digitalWrite(dataPin, 0);
+    if (sendBit) digitalWrite(dataPin, 1);
+    else         digitalWrite(dataPin, 0);
 
     clockPulse(shiftPin);
   }
@@ -177,9 +177,9 @@ void showPattern(const LED_rc_bits_t& pattern)
   uint8_t port_b = 0b00000000; // This value gets sent to PORTB
   uint8_t port_d = 0b00000000; // This value gets sent to PORTD
 
-  for(uint8_t b = 0; b < 8; b++)
+  for (uint8_t b = 0; b < 8; b++)
   {
-    for(uint8_t i = 2; i > 0; i--) 
+    for (uint8_t i = 2; i > 0; i--) 
     {
       const uint8_t  rc                       = (2 * i * 4) - 1 - b;
       const uint8_t *isnotshiftreg_pin_and_rc = rc_and_pin_at_bit[rc];
@@ -190,27 +190,27 @@ void showPattern(const LED_rc_bits_t& pattern)
       const bool    bit              = get_rc_bit(pattern, rc_val);
 
       /* Set the values using port if this row/column goes directly to the pins. */
-      if(not_in_shift_reg)
+      if (not_in_shift_reg)
       {
         const uint8_t port_position = port_positions[pin];
  
-        if(bit) 
+        if (bit) 
         {
-          if(pin < 8) port_d |= port_position;
-          else        port_b |= port_position;
+          if (pin < 8) port_d |= port_position;
+          else         port_b |= port_position;
         }
         else
         {
-          if(pin < 8) port_d &= ~(port_position);
-          else        port_b &= ~(port_position);
+          if (pin < 8) port_d &= ~(port_position);
+          else         port_b &= ~(port_position);
         }
       }
 
       /* Set the values using shift if this row/column goes to the shift register. */
       else
       {
-        if(bit) shift |=  (1 << pin);  // Since the pin is constant for the shift register,
-        else    shift &= ~(1 << pin);  // the offset is its pin value instead.
+        if (bit) shift |=  (1 << pin);  // Since the pin is constant for the shift register,
+        else     shift &= ~(1 << pin);  // the offset is its pin value instead.
       }
     }
   }
@@ -249,7 +249,7 @@ void setup() {
 void loop() 
 {
   
-  for(uint8_t i = 0; i < 22; i++) 
+  for (uint8_t i = 0; i < 22; i++) 
   {
     
     showPattern(patterns[i]);
