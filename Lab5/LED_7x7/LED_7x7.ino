@@ -45,7 +45,7 @@ const uint8_t rcs   [nshift_bits] = {c7, c6, r1, c0, r3, c5, c3, r0};
 /*/
  * Table for getting three things:
  * 1. Whether an bit position value goes to a hardware pin, or not.
- * 2. If hardwear, the pin is given; else the left shift amount is given (position from the right in rcs).
+ * 2. If hardware, the pin is given; else the left shift amount is given (position from the right in rcs).
  * 3. The rc value for that bit position.
 /*/
 const uint8_t nbits = 16;
