@@ -8,7 +8,7 @@
 enum : uint8_t
 { 
 
-  // Columns 0 -> 7
+  // Columns = 0 -> 7
   c0=0,
   c1,
   c2,
@@ -18,7 +18,7 @@ enum : uint8_t
   c6,
   c7,
 
-  // Rows 8 -> 15
+  // Rows = 8 -> 15
   r0=8,
   r1,
   r2,
@@ -31,14 +31,14 @@ enum : uint8_t
 };
 
 
-const uint8_t outputPin = 3; // RCLK  -- ⚠ Change me if yours is different ⚠
-const uint8_t dataPin   = 4; // DATA  -- ⚠ Change me if yours is different ⚠
-const uint8_t shiftPin  = 2; // SRCLK -- ⚠ Change me if yours is different ⚠
+const uint8_t outputPin = 3;  // RCLK  -- ⚠ Change me if yours is different ⚠
+const uint8_t dataPin   = 4;  // DATA  -- ⚠ Change me if yours is different ⚠
+const uint8_t shiftPin  = 2;  // SRCLK -- ⚠ Change me if yours is different ⚠
 
 
 const uint8_t nhardwire   = 8;
 const uint8_t nshift_bits = 8;
-const uint8_t h_pins[nhardwire  ] = {12, 11, 10,  9,  8,  7,  6,  5}; // -- ⚠ Change me if yours is different ⚠
+const uint8_t h_pins[nhardwire  ] = {12, 11, 10,  9,  8,  7,  6,  5};  // -- ⚠ Change me if yours is different ⚠
 const uint8_t rch   [nhardwire  ] = {r4, r6, c1, c2, r7, c4, r5, r2};
 const uint8_t rcs   [nshift_bits] = {c7, c6, r1, c0, r3, c5, c3, r0};
 
@@ -90,6 +90,7 @@ const uint8_t port_positions[14] =
 };
 
 
+/* Patterns are just 16-Bit Unsigned Integers */
 typedef uint16_t LED_rc_bits_t;
 
 
@@ -104,20 +105,20 @@ const uint16_t     npatterns = 6 + 8 + 8;
 const LED_rc_bits_t patterns[npatterns] =
 {
 
-  /*------------------
+  /*-----------------/
     ROW    COL
     ON: 0  ON: 1   
     7654321076543210
-  ------------------*/
+  /-----------------*/
 
-  0b1111111100000000, // All LEDs OFF
-  0b0000000011111111, // All LEDs ON
-  0b0111111010000001, // Corner LEDs ON
-  0b1011110101000010, // Corner Inset-1
-  0b1101101100100100, // Corner Inset-2
-  0b1110011100011000, // Center 4
+  0b1111111100000000,  // All LEDs OFF
+  0b0000000011111111,  // All LEDs ON
+  0b0111111010000001,  // Corner LEDs ON
+  0b1011110101000010,  // Corner LEDs Inset-1
+  0b1101101100100100,  // Corner LEDs Inset-2
+  0b1110011100011000,  // Center 4 LEDs
 
-  0b0000000010000000, // Right-to-left Col Scan
+  0b0000000010000000,  // Right-to-Left Col Scan
   0b0000000001000000,
   0b0000000000100000,
   0b0000000000010000,
@@ -126,7 +127,7 @@ const LED_rc_bits_t patterns[npatterns] =
   0b0000000000000010,
   0b0000000000000001,
 
-  0b0111111111111111, // Bottom-to-top Row Scan
+  0b0111111111111111,  // Bottom-to-Top Row Scan
   0b1011111111111111,
   0b1101111111111111,
   0b1110111111111111,
@@ -138,6 +139,7 @@ const LED_rc_bits_t patterns[npatterns] =
 };
 
 
+/* Pulse shift register clock (shifts 1 bit or outputs) */
 void clockPulse(const uint8_t& pin) 
 {
   digitalWrite(pin, 1);
@@ -145,20 +147,19 @@ void clockPulse(const uint8_t& pin)
 }
 
 
+/*/
+ *  Send an 8-Bit Integer to the Shift Register,
+ *  then shift through it and output it.
+/*/
 void sendByte(const uint8_t& data) 
 {
   for (uint8_t b = 0; b < 8; b++) 
   {
     bool sendBit = data & (1 << b);
 
-    if(sendBit) 
-    {
-      digitalWrite(dataPin, 1);
-    }
-    else 
-    {
-      digitalWrite(dataPin, 0);
-    }
+    if(sendBit) digitalWrite(dataPin, 1);
+    else        digitalWrite(dataPin, 0);
+
     clockPulse(shiftPin);
   }
   clockPulse(outputPin);
