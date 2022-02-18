@@ -44,12 +44,12 @@ const uint8_t rc_s  [n_shift_bits     ] = {c7, c6, r1, c0, r3, c5, c3, r0};
 
 /*/
  * Table for getting three things:
- * 1. Whether an bit position value goes to a hardware pin, or not.
+ * 1. If a bit position value goes to a hardware pin, or not.
  * 2. If hardware, the pin is given; else the left shift amount is given (position from the right in rc_s).
  * 3. The rc value for that bit position.
 /*/
 const uint8_t n_bits = 16;
-const uint8_t ishardware_pin_and_rc_at_bit[n_bits][3] =
+const uint8_t is_hardware_pin_and_rc_at_bit[n_bits][3] =
 {
   {0,         4, rc_s[3]},  // -- C0
   {1, h_pins[2], rc_h[2]},  // -- C1
@@ -182,12 +182,12 @@ void showPattern(const LED_rc_bits_t& pattern)
     for (uint8_t i = 2; i > 0; i--) 
     {
       const uint8_t  rc                    = (2 * i * 4) - 1 - b;
-      const uint8_t *ishardware_pin_and_rc = ishardware_pin_and_rc_at_bit[rc];
+      const uint8_t *is_hardware_pin_and_rc = is_hardware_pin_and_rc_at_bit[rc];
 
-      const uint8_t  pin         = ishardware_pin_and_rc [1];  
-      const uint8_t  rc_val      = ishardware_pin_and_rc [2];
-      const bool     is_hardware = ishardware_pin_and_rc [0];
-      const bool     bit         = getRCBit(pattern, rc_val);
+      const uint8_t  pin         = is_hardware_pin_and_rc [1];  
+      const uint8_t  rc_val      = is_hardware_pin_and_rc [2];
+      const bool     is_hardware = is_hardware_pin_and_rc [0];
+      const bool     bit         = getRCBit(pattern,  rc_val);
 
       /* Set the values using port if this row/column goes directly to the pins. */
       if (is_hardware)
