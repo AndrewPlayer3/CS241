@@ -95,7 +95,7 @@ typedef uint16_t LED_rc_bits_t;
 
 
 /* Extract a bit from pattern from rc position bit */
-inline bool get_rc_bit(const LED_rc_bits_t& rc_bits, const uint8_t& bit)
+inline bool getRCBit(const LED_rc_bits_t& rc_bits, const uint8_t& bit)
 {
   return ((rc_bits >> bit) & 1);
 }
@@ -184,10 +184,10 @@ void showPattern(const LED_rc_bits_t& pattern)
       const uint8_t  rc                    = (2 * i * 4) - 1 - b;
       const uint8_t *ishardware_pin_and_rc = ishardware_pin_and_rc_at_bit[rc];
 
-      const uint8_t  pin         = ishardware_pin_and_rc[1];  
-      const uint8_t  rc_val      = ishardware_pin_and_rc[2];
-      const bool     is_hardware = ishardware_pin_and_rc[0];
-      const bool     bit         = get_rc_bit(pattern, rc_val);
+      const uint8_t  pin         = ishardware_pin_and_rc [1];  
+      const uint8_t  rc_val      = ishardware_pin_and_rc [2];
+      const bool     is_hardware = ishardware_pin_and_rc [0];
+      const bool     bit         = getRCBit(pattern, rc_val);
 
       /* Set the values using port if this row/column goes directly to the pins. */
       if (is_hardware)
