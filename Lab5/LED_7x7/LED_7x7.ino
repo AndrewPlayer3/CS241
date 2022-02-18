@@ -31,42 +31,42 @@ enum : uint8_t
 };
 
 
-const uint8_t outputPin = 3;  // RCLK  -- ⚠ Change me if yours is different ⚠
-const uint8_t dataPin   = 4;  // DATA  -- ⚠ Change me if yours is different ⚠
-const uint8_t shiftPin  = 2;  // SRCLK -- ⚠ Change me if yours is different ⚠
+const uint8_t output_pin = 3;  // RCHK  -- ⚠ Change me if yours is different ⚠
+const uint8_t data_pin   = 4;  // DATA  -- ⚠ Change me if yours is different ⚠
+const uint8_t shift_pin  = 2;  // SRCLK -- ⚠ Change me if yours is different ⚠
 
 
-const uint8_t nhardwire   = 8;
-const uint8_t nshift_bits = 8;
-const uint8_t h_pins[nhardwire  ] = {12, 11, 10,  9,  8,  7,  6,  5};  // -- ⚠ Change me if yours is different ⚠
-const uint8_t rch   [nhardwire  ] = {r4, r6, c1, c2, r7, c4, r5, r2};
-const uint8_t rcs   [nshift_bits] = {c7, c6, r1, c0, r3, c5, c3, r0};
+const uint8_t n_hard_wire_bits  = 8;
+const uint8_t n_shift_bits      = 8;
+const uint8_t h_pins[n_hard_wire_bits ] = {12, 11, 10,  9,  8,  7,  6,  5};  // -- ⚠ Change me if yours is different ⚠
+const uint8_t rc_h  [n_hard_wire_bits ] = {r4, r6, c1, c2, r7, c4, r5, r2};
+const uint8_t rc_s  [n_shift_bits     ] = {c7, c6, r1, c0, r3, c5, c3, r0};
 
 /*/
  * Table for getting three things:
  * 1. Whether an bit position value goes to a hardware pin, or not.
- * 2. If hardware, the pin is given; else the left shift amount is given (position from the right in rcs).
+ * 2. If hardware, the pin is given; else the left shift amount is given (position from the right in rc_s).
  * 3. The rc value for that bit position.
 /*/
-const uint8_t nbits = 16;
-const uint8_t ishardware_pin_and_rc_at_bit[nbits][3] =
+const uint8_t n_bits = 16;
+const uint8_t ishardware_pin_and_rc_at_bit[n_bits][3] =
 {
-  {0,         4, rcs[3]},  // -- C0
-  {1, h_pins[2], rch[2]},  // -- C1
-  {1, h_pins[3], rch[3]},  // -- C2
-  {0,         1, rcs[6]},  // -- C3
-  {1, h_pins[5], rch[5]},  // -- C4
-  {0,         2, rcs[5]},  // -- C5
-  {0,         6, rcs[1]},  // -- C6
-  {0,         7, rcs[0]},  // -- C7
-  {0,         0, rcs[7]},  // -- R0
-  {0,         5, rcs[2]},  // -- R1
-  {1, h_pins[7], rch[7]},  // -- R2
-  {0,         3, rcs[4]},  // -- R3
-  {1, h_pins[0], rch[0]},  // -- R4
-  {1, h_pins[6], rch[6]},  // -- R5
-  {1, h_pins[1], rch[1]},  // -- R6
-  {1, h_pins[4], rch[4]}   // -- R7
+  {0,         4, rc_s[3]},  // -- C0
+  {1, h_pins[2], rc_h[2]},  // -- C1
+  {1, h_pins[3], rc_h[3]},  // -- C2
+  {0,         1, rc_s[6]},  // -- C3
+  {1, h_pins[5], rc_h[5]},  // -- C4
+  {0,         2, rc_s[5]},  // -- C5
+  {0,         6, rc_s[1]},  // -- C6
+  {0,         7, rc_s[0]},  // -- C7
+  {0,         0, rc_s[7]},  // -- R0
+  {0,         5, rc_s[2]},  // -- R1
+  {1, h_pins[7], rc_h[7]},  // -- R2
+  {0,         3, rc_s[4]},  // -- R3
+  {1, h_pins[0], rc_h[0]},  // -- R4
+  {1, h_pins[6], rc_h[6]},  // -- R5
+  {1, h_pins[1], rc_h[1]},  // -- R6
+  {1, h_pins[4], rc_h[4]}   // -- R7
 };
 
 
@@ -95,14 +95,14 @@ typedef uint16_t LED_rc_bits_t;
 
 
 /* Extract a bit from pattern from rc position bit */
-inline bool getRCBit(const LED_rc_bits_t& rc_bits, const uint8_t& bit)
+inline bool getRCBit(const LED_rc_bits_t& pattern_bits, const uint8_t& rc_bit)
 {
-  return ((rc_bits >> bit) & 1);
+  return ((pattern_bits >> rc_bit) & 1);
 }
 
 
-const uint16_t     npatterns = 6 + 8 + 8;
-const LED_rc_bits_t patterns[npatterns] =
+const uint16_t               n_patterns  = 22;
+const LED_rc_bits_t patterns[n_patterns] =
 {
 
   /*-----------------/
@@ -153,16 +153,16 @@ void clockPulse(const uint8_t& pin)
 /*/
 void sendByte(const uint8_t& data) 
 {
-  for (uint8_t b = 0; b < 8; b++) 
+  for (uint8_t bit = 0; bit < 8; bit++) 
   {
-    bool sendBit = data & (1 << b);
+    bool send_bit = data & (1 << bit);
 
-    if (sendBit) digitalWrite(dataPin, 1);
-    else         digitalWrite(dataPin, 0);
+    if (send_bit) digitalWrite(data_pin, 1);
+    else          digitalWrite(data_pin, 0);
 
-    clockPulse(shiftPin);
+    clockPulse(shift_pin);
   }
-  clockPulse(outputPin);
+  clockPulse(output_pin);
 }
 
 
@@ -227,21 +227,17 @@ void setup() {
 
   Serial.println("Serial Activated!");
 
-  pinMode(5 , OUTPUT);
-  pinMode(6 , OUTPUT);
-  pinMode(7 , OUTPUT);
-  pinMode(8 , OUTPUT);
-  pinMode(9 , OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(12, OUTPUT);
+  for (uint8_t hardware_pin : h_pins)
+  {
+    pinMode(hardware_pin, OUTPUT);
+  }
 
-  pinMode(outputPin, OUTPUT);
-  digitalWrite(outputPin, 0);
-  pinMode(shiftPin , OUTPUT);
-  digitalWrite(shiftPin , 0);
-  pinMode(dataPin  , OUTPUT);
-  digitalWrite(dataPin  , 0);
+  pinMode(output_pin, OUTPUT);
+  digitalWrite(output_pin, 0);
+  pinMode(shift_pin , OUTPUT);
+  digitalWrite(shift_pin , 0);
+  pinMode(data_pin  , OUTPUT);
+  digitalWrite(data_pin  , 0);
 
 }
 
