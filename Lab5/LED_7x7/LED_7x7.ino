@@ -26,6 +26,7 @@ const uint8_t h_pins[n_hard_wire_bits ] = {12, 11, 10,  9,  8,  7,  6,  5};  // 
 const uint8_t rc_h  [n_hard_wire_bits ] = {R4, R6, C1, C2, R7, C4, R5, R2};
 const uint8_t rc_s  [n_shift_bits     ] = {C7, C6, R1, C0, R3, C5, C3, R0};
 
+
 /*/
  * Table for getting three things:
  * 1. If a bit position value goes to a hardware pin, or not.
@@ -139,7 +140,7 @@ void sendByte(const uint8_t& data)
 {
   for (uint8_t bit = 0; bit < 8; bit++) 
   {
-    bool send_bit = data & (1 << bit);
+    const bool send_bit = data & (1 << bit);
 
     if (send_bit) digitalWrite(data_pin, 1);
     else          digitalWrite(data_pin, 0);
@@ -166,17 +167,17 @@ void showPattern(const LED_rc_bits_t& pattern)
     for (uint8_t i = 2; i > 0; i--) 
     {
       const uint8_t  rc                     = (2 * i * 4) - 1 - b;
-      const uint8_t *is_hardware_pin_and_rc = is_hardware_pin_and_rc_at_bit[rc];
+      const uint8_t* is_hardware_pin_and_rc = is_hardware_pin_and_rc_at_bit[rc];
 
-      const uint8_t  pin         = is_hardware_pin_and_rc [1];  
-      const uint8_t  rc_val      = is_hardware_pin_and_rc [2];
-      const bool     is_hardware = is_hardware_pin_and_rc [0];
+      const uint8_t& pin         = is_hardware_pin_and_rc [1];  
+      const uint8_t& rc_val      = is_hardware_pin_and_rc [2];
+      const bool&    is_hardware = is_hardware_pin_and_rc [0];
       const bool     bit         = getRCBit(pattern,  rc_val);
 
       /* Set the values using port if this row/column goes directly to the pins. */
       if (is_hardware)
-      {
-        const uint8_t port_position = port_positions[pin];
+      { 
+        const uint8_t& port_position = port_positions[pin];
  
         if (bit) 
         {
@@ -205,36 +206,35 @@ void showPattern(const LED_rc_bits_t& pattern)
 }
 
 
-void setup() {
-
+void setup()
+{
   Serial.begin(115200);
 
   Serial.println("Serial Activated!");
 
-  for (uint8_t hardware_pin : h_pins)
+  for (const uint8_t& hardware_pin : h_pins) 
   {
-    pinMode(hardware_pin, OUTPUT);
+  pinMode(hardware_pin, OUTPUT);
   }
 
   pinMode(output_pin, OUTPUT);
   digitalWrite(output_pin, 0);
+
   pinMode(shift_pin , OUTPUT);
   digitalWrite(shift_pin , 0);
+
   pinMode(data_pin  , OUTPUT);
   digitalWrite(data_pin  , 0);
-
 }
 
 
 void loop() 
 {
   
-  for (uint8_t i = 0; i < 22; i++) 
+  for (const LED_rc_bits_t& pattern : patterns) 
   {
-    
-    showPattern(patterns[i]);
-    delay(500);
-
+    showPattern(pattern);
+    delay(200);
   }
 
 }
