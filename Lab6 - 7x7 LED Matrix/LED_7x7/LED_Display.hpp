@@ -67,8 +67,7 @@ const static uint8_t shift_offsets[n_shift_bits] = { 7,  6,  5,  4,  3,  2,  1, 
  * 
  * @Note:
  * ------
- * If your hard-wired pins are not hooked to the Row 4 -> Row 2 side, you need to switch them
- * above in this file.
+ * The hard-wired pins need to be hooked up to the side with Row 4
  * 
  * @Params:
  * --------
@@ -106,6 +105,8 @@ struct LED_Display
         
         uint8_t hard_wire_rc  [n_hard_wire_bits] = {R4, R6, C1, C2, R7, C4, R5, R2};
         uint8_t shift_rc      [n_shift_bits    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
+
+        bool swap_state = false;
 
         /*/
         * Table for getting three things:
