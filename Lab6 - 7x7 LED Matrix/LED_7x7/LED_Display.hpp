@@ -175,7 +175,7 @@ struct LED_Display
 
         /* --- Mutators --- */
 
-        // Swap hard_wire_rc and shift_rc
+        // Swap hard_wire_rc and shift_rc (This breaks things.)
         void swapRC();
         
         
