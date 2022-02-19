@@ -135,7 +135,7 @@ void LED_Display::setIsHardwiredPinAndRcAtBit()
 
 
 void LED_Display::flipSetup()
-{// Not tested, and not necessary, but I believe in it anyway.
+{
     if (n_hard_wire_bits != n_shift_bits)
     {
         Serial.println("ARRAY SIZES DONT MATCH FOR SWAPRC!");
