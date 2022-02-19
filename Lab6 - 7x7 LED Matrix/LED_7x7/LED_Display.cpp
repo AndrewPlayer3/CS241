@@ -141,6 +141,25 @@ void LED_Display::setIsHardwiredPinAndRcAtBit()
 }
 
 
+void LED_Display::swapRC()
+{// Not tested, and not necessary, but I believe in it anyway.
+    if (n_hard_wire_bits != n_shift_bits)
+    {
+        Serial.println("ARRAY SIZES DONT MATCH FOR SWAPRC!");
+        return;
+    }
+
+    uint8_t temp[n_hard_wire_bits] = { 0 };
+
+    for (uint8_t index = 0; index < n_hard_wire_bits; index++)
+    {
+            temp[index] = hard_wire_rc[index];
+            hard_wire_rc[index] = shift_rc[index];
+            shift_rc[index] = temp[index];
+    }
+}
+
+
 bool LED_Display::getRCBit(const LED_rc_bits_t& pattern_bits, const uint8_t& rc_bit) const 
 { 
     return ((pattern_bits >> rc_bit) & 1); 

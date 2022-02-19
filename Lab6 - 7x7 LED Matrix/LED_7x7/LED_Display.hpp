@@ -37,10 +37,6 @@ enum : uint8_t
     R0 = 8, R1, R2, R3, R4, R5, R6, R7,
 };
 
-const static uint8_t hard_wire_rc  [n_hard_wire_bits] = {R4, R6, C1, C2, R7, C4, R5, R2};
-const static uint8_t shift_rc      [n_shift_bits    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
-const static uint8_t shift_offsets [n_shift_bits    ] = { 7,  6,  5,  4,  3,  2,  1,  0};
-
 /* Port bit positions for pins */
 const static uint8_t port_positions[14] = 
 {
@@ -60,6 +56,7 @@ const static uint8_t port_positions[14] =
     0b00100000   // -- Pin 13
 };
 
+const static uint8_t shift_offsets[n_shift_bits] = { 7,  6,  5,  4,  3,  2,  1,  0 };
 
 /*
  * LED_Display
@@ -106,6 +103,9 @@ struct LED_Display
         
         LED_rc_bits_t patterns[n_pixels * 2];
         uint8_t       pixels  [n_pixels    ];
+        
+        uint8_t hard_wire_rc  [n_hard_wire_bits] = {R4, R6, C1, C2, R7, C4, R5, R2};
+        uint8_t shift_rc      [n_shift_bits    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
 
         /*/
         * Table for getting three things:
@@ -171,6 +171,12 @@ struct LED_Display
         
         // Set the values in the pixel array
         void setPixels(const uint8_t pixel_drawing[n_pixels]);
+
+
+        /* --- Mutators --- */
+
+        // Swap hard_wire_rc and shift_rc
+        void swapRC();
         
         
         /* --- Output Member Functions --- */
