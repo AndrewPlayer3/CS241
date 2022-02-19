@@ -2,10 +2,6 @@
  * Print Patterns on 7x7 LED Display
  * Andrew Player
  * 2022
- * 
- * ⚠ Note: To make an array to draw, simply fill in draw_in_this_array above loop. 
- * ⚠       Each digit represents a pixel on the LED, make a digit 1 for the pixel 
- * ⚠       to be on, and 0 for it to be off. :)
 /*/
 
 
