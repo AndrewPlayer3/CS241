@@ -7,27 +7,11 @@
 
 enum : uint8_t
 { 
+  // Cols: 0 ->  7
+  C0 = 0, C1, C2, C3, C4, C5, C6, C7,
 
-  // Cols = 0 -> 7
-  c0=0,
-  c1,
-  c2,
-  c3,
-  c4,
-  c5,
-  c6,
-  c7,
-
-  // Rows = 8 -> 15
-  r0=8,
-  r1,
-  r2,
-  r3,
-  r4,
-  r5,
-  r6,
-  r7
-
+  // Rows: 8 -> 15
+  R0 = 8, R1, R2, R3, R4, R5, R6, R7,
 };
 
 
@@ -39,8 +23,8 @@ const uint8_t shift_pin  = 2;  // SRCLK -- ⚠ Change me if yours is different �
 const uint8_t n_hard_wire_bits  = 8;
 const uint8_t n_shift_bits      = 8;
 const uint8_t h_pins[n_hard_wire_bits ] = {12, 11, 10,  9,  8,  7,  6,  5};  // -- ⚠ Change me if yours is different ⚠
-const uint8_t rc_h  [n_hard_wire_bits ] = {r4, r6, c1, c2, r7, c4, r5, r2};
-const uint8_t rc_s  [n_shift_bits     ] = {c7, c6, r1, c0, r3, c5, c3, r0};
+const uint8_t rc_h  [n_hard_wire_bits ] = {R4, R6, C1, C2, R7, C4, R5, R2};
+const uint8_t rc_s  [n_shift_bits     ] = {C7, C6, R1, C0, R3, C5, C3, R0};
 
 /*/
  * Table for getting three things:
@@ -181,7 +165,7 @@ void showPattern(const LED_rc_bits_t& pattern)
   {
     for (uint8_t i = 2; i > 0; i--) 
     {
-      const uint8_t  rc                    = (2 * i * 4) - 1 - b;
+      const uint8_t  rc                     = (2 * i * 4) - 1 - b;
       const uint8_t *is_hardware_pin_and_rc = is_hardware_pin_and_rc_at_bit[rc];
 
       const uint8_t  pin         = is_hardware_pin_and_rc [1];  
