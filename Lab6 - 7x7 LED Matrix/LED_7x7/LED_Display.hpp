@@ -56,7 +56,6 @@ const static uint8_t port_positions[14] =
     0b00100000   // -- Pin 13
 };
 
-const static uint8_t shift_offsets[n_shift_bits] = { 7,  6,  5,  4,  3,  2,  1,  0 };
 
 /*
  * LED_Display
@@ -67,14 +66,16 @@ const static uint8_t shift_offsets[n_shift_bits] = { 7,  6,  5,  4,  3,  2,  1, 
  * 
  * @Note:
  * ------
- * The hard-wired pins need to be hooked up to the side with Row 4
+ * By default it is assumed that the hard-wired side is the side with Row 4,
+ * if not, just you need to use the flipSetup() method.
  * 
  * @Params:
  * --------
  * shift_pins: uint8_t[#shift_register_pins (3)]
  *  This array should contain the pin numbers in this order: DATA, SRCLK, RCHK.
  * hard_wire_pins: uint8_t[#hard_wired_pins (8)]
- *  This array should contain the pin numbers as they correspond to this order: {R4, R6, C1, C2, R7, C4, R5, R2}
+ *  This array should contain the pin numbers as they correspond to this order: {R4, R6, C1, C2, R7, C4, R5, R2} if default.
+ *                                                                           or {R0, C3, C5, R3, C0, R1, C6, C7} if using flipSetup().
  * pixel_drawing: uint8_t[#pixels (8)]
  *  This array contains an array of binary numbers, 1 8-bit number for each row.
  *  Each digit in the binary number represents the respective pixel. 0's are off, 1's are on.
@@ -105,8 +106,7 @@ struct LED_Display
         
         uint8_t hard_wire_rc  [n_hard_wire_bits] = {R4, R6, C1, C2, R7, C4, R5, R2};
         uint8_t shift_rc      [n_shift_bits    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
-
-        bool swap_state = false;
+        uint8_t shift_offsets [n_shift_bits    ] = { 7,  6,  5,  4,  3,  2,  1,  0};
 
         /*/
         * Table for getting three things:
@@ -176,8 +176,8 @@ struct LED_Display
 
         /* --- Mutators --- */
 
-        // Swap hard_wire_rc and shift_rc (This breaks things.)
-        void swapRC();
+        // This flips the configuration so that it will work with the shift_reg on the Row 4 side.
+        void flipSetup();
         
         
         /* --- Output Member Functions --- */

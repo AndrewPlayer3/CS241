@@ -111,37 +111,30 @@ void LED_Display::setPinModes() const
 
 void LED_Display::setIsHardwiredPinAndRcAtBit()
 {
-    uint8_t temp[n_bits][3] = 
-    {
-        {false, shift_offsets [3], shift_rc    [3]},  // -- C0
-        {true , hard_wire_pins[2], hard_wire_rc[2]},  // -- C1
-        {true , hard_wire_pins[3], hard_wire_rc[3]},  // -- C2
-        {false, shift_offsets [6], shift_rc    [6]},  // -- C3
-        {true , hard_wire_pins[5], hard_wire_rc[5]},  // -- C4
-        {false, shift_offsets [5], shift_rc    [5]},  // -- C5
-        {false, shift_offsets [1], shift_rc    [1]},  // -- C6
-        {false, shift_offsets [0], shift_rc    [0]},  // -- C7
-        {false, shift_offsets [7], shift_rc    [7]},  // -- R0
-        {false, shift_offsets [2], shift_rc    [2]},  // -- R1
-        {true , hard_wire_pins[7], hard_wire_rc[7]},  // -- R2
-        {false, shift_offsets [4], shift_rc    [4]},  // -- R3
-        {true , hard_wire_pins[0], hard_wire_rc[0]},  // -- R4
-        {true , hard_wire_pins[6], hard_wire_rc[6]},  // -- R5
-        {true , hard_wire_pins[1], hard_wire_rc[1]},  // -- R6
-        {true , hard_wire_pins[4], hard_wire_rc[4]}   // -- R7
-    };
-
     for (uint8_t row = 0; row < n_bits; row++)
     {
-        for (uint8_t col = 0; col < 3; col++)
+        for (uint8_t col = 0; col < n_hard_wire_bits; col++)
         {
-            is_hardwired_pin_and_rc_at_bit[row][col] = temp[row][col];
+            if (row == hard_wire_rc[col])
+            { 
+                is_hardwired_pin_and_rc_at_bit[row][0] = true;
+                is_hardwired_pin_and_rc_at_bit[row][1] = hard_wire_pins[col];
+                is_hardwired_pin_and_rc_at_bit[row][2] = row;
+                break;
+            }
+            if (row == shift_rc[col])
+            {
+                is_hardwired_pin_and_rc_at_bit[row][0] = false;
+                is_hardwired_pin_and_rc_at_bit[row][1] = shift_offsets[col];
+                is_hardwired_pin_and_rc_at_bit[row][2] = row;
+                break;
+            }
         }
     }
 }
 
 
-void LED_Display::swapRC()
+void LED_Display::flipSetup()
 {// Not tested, and not necessary, but I believe in it anyway.
     if (n_hard_wire_bits != n_shift_bits)
     {
@@ -149,14 +142,24 @@ void LED_Display::swapRC()
         return;
     }
 
-    uint8_t temp[n_hard_wire_bits] = { 0 };
-
+    uint8_t back = n_hard_wire_bits - 1;
     for (uint8_t index = 0; index < n_hard_wire_bits; index++)
     {
-            temp[index] = hard_wire_rc[index];
-            hard_wire_rc[index] = shift_rc[index];
-            shift_rc[index] = temp[index];
+        uint8_t h_temp = hard_wire_rc[index];
+        uint8_t s_temp = shift_rc[index];
+        hard_wire_rc[index] = s_temp;
+        shift_rc[index] = h_temp;
+
+        if(index < back)
+        {
+            uint8_t o_temp = shift_offsets[index];
+            shift_offsets[index] = shift_offsets[back];
+            shift_offsets[back] = o_temp;
+        }
+        back--;
     }
+
+    setIsHardwiredPinAndRcAtBit();
 }
 
 
