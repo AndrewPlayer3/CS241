@@ -86,7 +86,7 @@ inline bool getRCBit(const LED_rc_bits_t& pattern_bits, const uint8_t& rc_bit)
 }
 
 
-const uint16_t               n_patterns  = 22;
+const uint16_t               n_patterns  = 7;
 const LED_rc_bits_t patterns[n_patterns] =
 {
 
@@ -96,30 +96,13 @@ const LED_rc_bits_t patterns[n_patterns] =
       7654321076543210
     /-----------------*/
 
-    0b1111111100000000,  // All LEDs OFF
-    0b0000000011111111,  // All LEDs ON
-    0b0111111010000001,  // Corner LEDs ON
-    0b1011110101000010,  // Corner LEDs Inset-1
-    0b1101101100100100,  // Corner LEDs Inset-2
-    0b1110011100011000,  // Center 4 LEDs
-
-    0b0000000010000000,  // Right-to-Left Col Scan
-    0b0000000001000000,
-    0b0000000000100000,
-    0b0000000000010000,
-    0b0000000000001000,
-    0b0000000000000100,
-    0b0000000000000010,
-    0b0000000000000001,
-
-    0b0111111111111111,  // Bottom-to-Top Row Scan
-    0b1011111111111111,
-    0b1101111111111111,
-    0b1110111111111111,
-    0b1111011111111111,
-    0b1111101111111111,
-    0b1111110111111111,
-    0b1111111011111111,
+    0b1011111101100110,
+    0b1111111100000000,
+    0b1101111101100110,
+    0b1111111100000000,
+    0b1111101111000011,
+    0b1111111100000000,
+    0b1111110101111110
 
 };
 
@@ -206,6 +189,12 @@ void showPattern(const LED_rc_bits_t& pattern)
 }
 
 
+void clearPattern()
+{
+    showPattern(0b1111111100000000);
+}
+
+
 void setup()
 {
     Serial.begin(115200);
@@ -230,11 +219,12 @@ void setup()
 
 void loop() 
 {
-  
+    clearPattern(); 
+
     for (const LED_rc_bits_t& pattern : patterns) 
     {
         showPattern(pattern);
-        delay(200);
+        delay(1);
     }
 
 }
