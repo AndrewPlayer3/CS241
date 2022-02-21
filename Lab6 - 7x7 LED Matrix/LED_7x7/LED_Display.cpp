@@ -93,8 +93,9 @@ void LED_Display::setPatternArray()
         patterns[row] = 0b1111111100000000;
     }
 
-    // Go through each uint8_t pixel row and generate a LED_rc_bits_t pattern row
     uint8_t placement = 0;
+
+    // Go through each uint8_t pixel row and generate a LED_rc_bits_t pattern row
     for (int8_t row = n_pixels - 1; row >= 0; row--)
     { 
         LED_rc_bits_t pattern_row = 0b1111111100000000;
@@ -216,7 +217,7 @@ void LED_Display::sendByte(const uint8_t& data) const
         else                   {PICKPORTANDWRITE0(DATA_pin);}
 
        /* Fun fact: If I assume that this goes to Port D, and replace this with PORTDWRITE1 and PORTDWRITE0,
-        *           along with the similar calls above and below, it is actually consistantly slightly slower. 
+        *           along with the similar calls above and below, it is actually consistantly significantly slower. 
         */
         CLOCKPULSE(SRCLK_pin); 
     }
@@ -253,6 +254,7 @@ void LED_Display::showPattern(const LED_rc_bits_t& pattern) const
                 else         port_b &= ~(PORTOFFSETFORPIN(pin));
             }
         }
+
         /* Set the values using shift if this row/column goes to the shift register. */
         else
         {

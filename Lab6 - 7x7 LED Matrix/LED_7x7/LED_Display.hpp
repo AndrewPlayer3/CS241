@@ -44,15 +44,20 @@ enum : uint8_t
  * -------------
  * This struct contains everything for drawing on a 1588AS 8x8 LED Dislpay with a 74HC595 shift register.
  * 
- * @Note:
+ * @Notes:
  * ------
  * By default it is assumed that the hard-wired side is the side with Row 4,
- * if not, just you need to use the flipSetup() method.
+ * if not, you need to call the flipSetup() method after initiallizing the object.
+ * You do not need to call it more than once.
+ * 
+ * The top of the display (the zeroth row of pixels) is the side of the display
+ * with the model numbers printed on.
  * 
  * @Params:
  * --------
  * shift_pins: uint8_t[#shift_register_pins (3)]
  *  This array should contain the pin numbers in this order: DATA, SRCLK, RCHK.
+ * 
  * hard_wire_pins: uint8_t[#hard_wired_pins (8)]
  *  This array should contain the pin numbers as they correspond to this order: {R4, R6, C1, C2, R7, C4, R5, R2} if default.
  *                                                                           or {R0, C3, C5, R3, C0, R1, C6, C7} if using flipSetup().
