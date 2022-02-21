@@ -22,7 +22,7 @@ LED_Display display;
  * ⚠ 1 means the respective pixel will be ON                           
  * ⚠ 0 means the respective pixel will be OFF
 /*/
-const uint8_t pixel_drawing_frames[5][N_PIXELS] = 
+const uint8_t pixel_drawing_frames[3][N_PIXELS] = 
 {    
     {
         0b11000011,
@@ -53,27 +53,7 @@ const uint8_t pixel_drawing_frames[5][N_PIXELS] =
         0b00011000,
         0b00011000,
         0b00000000
-    },
-    {
-        0b11000011,
-        0b00000000,
-        0b01100110,
-        0b01100110,
-        0b00000000,
-        0b00111100,
-        0b00100100,
-        0b00011000
-    },
-    {
-        0b11000011,
-        0b00000000,
-        0b01100110,
-        0b01100110,
-        0b00000000,
-        0b00111100,
-        0b00100100,
-        0b00011000
-    },
+    }
 };
 
 void setup()
@@ -117,7 +97,7 @@ void loop()
       counter   = 0;
 
       frame += 1;
-      display.setPixels(pixel_drawing_frames[frame % 4]);
+      display.setPixels(pixel_drawing_frames[frame % 3]);
     }
 
     else counter++;
