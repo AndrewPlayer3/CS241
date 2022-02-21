@@ -12,18 +12,16 @@
 /*----------------------------------------------------------------------------------------------------------------*/
 /* Macros for speed and cleanliness, but feels illegal to me for some reason.                                     */
 /*----------------------------------------------------------------------------------------------------------------*/
-#define PORTOFFSETFORPIN(PIN) (0b00000001 << (PIN % 8))
+#define PORTDWRITE1(PIN) PORTD |=  (0b1 <<  PIN)
+#define PORTDWRITE0(PIN) PORTD &= ~(0b1 <<  PIN)
 
-#define PORTDWRITE1(PIN) PORTD |=  (0b00000001 <<  PIN)
-#define PORTDWRITE0(PIN) PORTD &= ~(0b00000001 <<  PIN)
-
-#define PORTBWRITE1(PIN) PORTB |=  (0b00000001 << (PIN % 8))
-#define PORTBWRITE0(PIN) PORTB &= ~(0b00000001 << (PIN % 8))
+#define PORTBWRITE1(PIN) PORTB |=  (0b1 << (PIN % 8))
+#define PORTBWRITE0(PIN) PORTB &= ~(0b1 << (PIN % 8))
 
 #define PICKPORTANDWRITE1(PIN) if (PIN < 8){PORTDWRITE1(PIN);} else {PORTBWRITE1(PIN);}
 #define PICKPORTANDWRITE0(PIN) if (PIN < 8){PORTDWRITE0(PIN);} else {PORTBWRITE0(PIN);}
 
-#define CLOCKPULSE(PIN) if (PIN < 8){PORTDWRITE1(PIN); PORTDWRITE0(PIN);} else {PORTBWRITE1(PIN); PORTBWRITE0(PIN);}
+#define CLOCKPULSE(PIN) if (PIN < 8) {PORTDWRITE1(PIN); PORTDWRITE0(PIN);} else {PORTBWRITE1(PIN); PORTBWRITE0(PIN);}
 /*----------------------------------------------------------------------------------------------------------------*/
 
 
@@ -219,7 +217,7 @@ void LED_Display::sendByte(const uint8_t& data) const
        /* Fun fact: If I assume that this goes to Port D, and replace this with PORTDWRITE1 and PORTDWRITE0,
         *           along with the similar calls above and below, it is actually consistantly significantly slower. 
         */
-        CLOCKPULSE(SRCLK_pin); 
+        CLOCKPULSE(SRCLK_pin);
     }
 
     CLOCKPULSE(RCLK_pin);
@@ -234,33 +232,17 @@ void LED_Display::showPattern(const LED_rc_bits_t& pattern) const
 
     for (uint8_t rc = 0; rc < 16; rc++)
     {
-        const bool&    is_hardware = is_hardwired_pin_and_rc_at_bit[rc][0];
-        const uint8_t& pin         = is_hardwired_pin_and_rc_at_bit[rc][1];  
-        const uint8_t& rc_val      = is_hardwired_pin_and_rc_at_bit[rc][2];
+        const bool&    is_shift = !is_hardwired_pin_and_rc_at_bit[rc][0];
+        const uint8_t& pin      =  is_hardwired_pin_and_rc_at_bit[rc][1];  
+        const uint8_t& rc_val   =  is_hardwired_pin_and_rc_at_bit[rc][2];
 
-        const bool bit = ((pattern >> rc_val) & 1);  // Give the bit at the row/column offset in the pattern.
+        const bool bit  = 1 & (pattern >> rc_val);  // Get the bit at the row/column offset in the pattern.
 
-        /* Set the values using port if this row/column goes directly to the pins. */
-        if (is_hardware)
-        {
-            if (bit) 
-            {
-                if (pin < 8) port_d |= (PORTOFFSETFORPIN(pin));
-                else         port_b |= (PORTOFFSETFORPIN(pin));
-            }
-            else
-            {
-                if (pin < 8) port_d &= ~(PORTOFFSETFORPIN(pin));
-                else         port_b &= ~(PORTOFFSETFORPIN(pin));
-            }
-        }
+        /* Place the bit in the correct position */
+        if (is_shift){shift  ^=  (bit << (pin)); continue;}
 
-        /* Set the values using shift if this row/column goes to the shift register. */
-        else
-        {
-            if (bit) shift |=  (1 << pin);  // Since the pin is constant for the shift register,
-            else     shift &= ~(1 << pin);  // the offset is its pin value instead.
-        }
+        if (pin < 8)  port_d += ~(port_d) & (bit << (pin    ));  // This is equivalent to _ ^= (bit << pin),
+        else          port_b += ~(port_d) & (bit << (pin % 8));  // but this is faster here.
     }
 
     PORTB = port_b ;
