@@ -113,10 +113,11 @@ struct LED_Display
         // Constructs the pattern array from the pixel array.
         void setPatternArray();
 
+        // Constructs the output pieces from the pattern array.
+        void setOutputArray();
+
         // Sets the pin mode for all pins to OUTPUT
         void setPinModes() const;
-
-        void setOutputArray();
 
         // Send one byte of data to the shift register and output it.
         void sendByte(const uint8_t& data) const;
