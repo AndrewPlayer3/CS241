@@ -1,5 +1,6 @@
 /*/
- * Print Patterns on 7x7 LED Display
+ * Library for Displaying Patterns on 74HC595 8x8 LED Display
+ * with a 74HC595 shift regesiter.
  * Andrew Player
  * 2022
 /*/
@@ -21,8 +22,10 @@
 #define n_pixels          8
 #define n_bits           16
 
+
 /* Patterns are just 16-Bit Unsigned  */
 typedef uint16_t LED_rc_bits_t;
+
 
 enum : uint8_t
 { 
@@ -33,32 +36,13 @@ enum : uint8_t
     R0 = 8, R1, R2, R3, R4, R5, R6, R7,
 };
 
-/* Port bit positions for pins */
-const static uint8_t port_positions[14] = 
-{
-    0b00000001,  // -- Pin  0
-    0b00000010,  // -- Pin  1
-    0b00000100,  // -- Pin  2
-    0b00001000,  // -- Pin  3
-    0b00010000,  // -- Pin  4
-    0b00100000,  // -- Pin  5
-    0b01000000,  // -- Pin  6
-    0b10000000,  // -- Pin  7
-    0b00000001,  // -- Pin  8
-    0b00000010,  // -- Pin  9
-    0b00000100,  // -- Pin 10
-    0b00001000,  // -- Pin 11
-    0b00010000,  // -- Pin 12
-    0b00100000   // -- Pin 13
-};
-
 
 /*
  * LED_Display
  *
  * @Description:
  * -------------
- * This struct contains everything for drawing on a 7x7 LED Dislpay with a shift register.
+ * This struct contains everything for drawing on a 1588AS 8x8 LED Dislpay with a 74HC595 shift register.
  * 
  * @Note:
  * ------
@@ -96,10 +80,10 @@ struct LED_Display
         uint8_t RCHK_pin ;  // Output Pin
 
         uint8_t hard_wire_pins[n_hard_wire_pins];
-        
+ 
         LED_rc_bits_t patterns[n_pixels * 2];
         uint8_t       pixels  [n_pixels    ];
-        
+
         uint8_t hard_wire_rc  [n_hard_wire_bits] = {R4, R6, C1, C2, R7, C4, R5, R2};
         uint8_t shift_rc      [n_shift_bits    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
         uint8_t shift_offsets [n_shift_bits    ] = { 7,  6,  5,  4,  3,  2,  1,  0};
@@ -111,13 +95,7 @@ struct LED_Display
         * 3. The rc value for that bit position.
         /*/
         uint8_t is_hardwired_pin_and_rc_at_bit[n_bits][3];
-
-
-        /* --- Getters --- */
-
-        // Get the rc value for the bit in pattern_bits offset by rc_bit
-        bool getRCBit(const LED_rc_bits_t& pattern_bits, const uint8_t& rc_bit) const; 
-
+ 
 
         /* --- Setters --- */
 
@@ -133,18 +111,8 @@ struct LED_Display
         // Sets the pin mode for all pins to OUTPUT
         void setPinModes() const;
 
-        // Pulse the clock pin UP and DOWN a single time
-        void clockPulse(const uint8_t& pin) const;
-        
         // Send one byte of data to the shift register and output it.
         void sendByte(const uint8_t& data) const;
-
-
-        /* --- Misc. --- */
-
-        // Shows a single byte pattern (used by drawPixels to show rows, but it can show anything).
-        void showPattern(const LED_rc_bits_t& pattern) const;
-
 
     public:
  
@@ -163,11 +131,22 @@ struct LED_Display
                   const uint8_t hardware_pins[n_hard_wire_pins],
                   const uint8_t pixel_drawing[n_pixels        ]);
 
+        ~LED_Display();
+
         
         /* --- Main Setter --- */
         
         // Set the values in the pixel array
         void setPixels(const uint8_t pixel_drawing[n_pixels]);
+
+
+        /* --- Getters --- */
+
+        // Return the pattern bits at pattern_row (returns NULL if out of bounds.)
+        uint8_t getPatternRow(const uint8_t& pattern_row) const;
+
+        // Return the row of pixel bits at pixel_row (returns NULL if out of bounds.)
+        uint8_t getPixelRow(const uint8_t& pixel_row) const;
 
 
         /* --- Mutators --- */
@@ -184,8 +163,14 @@ struct LED_Display
         // Serial Print the Pixel Values that are being read.
         void printPixels  () const;
 
+        // Shows a single byte pattern (used by drawPixels to show rows, but it can show anything).
+        void showPattern(const LED_rc_bits_t& pattern) const;
+
         // Draw the pixel array onto the LED Matrix.
         void drawDisplay  () const;
+
+        // Draw the pixek array onto the LED Matrix with delay microseconds.
+        void drawDisplay (const uint32_t& microseconds) const;
 };
 
 #endif
