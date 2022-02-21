@@ -85,7 +85,7 @@ void LED_Display::setPixels(const uint8_t pixel_drawing[N_PIXELS])
 }
 
 
-void LED_Display::_createPatternArray(LED_rc_bits_t patterns[N_PIXELS * 2]) 
+void LED_Display::_createPatternArray(LED_rc_bits_t patterns[N_PIXELS * 2]) const 
 {
     uint8_t placement = 0;
 
@@ -176,7 +176,7 @@ void LED_Display::_setPinModes() const
 }
 
 
-void LED_Display::_createPinRCTable(uint8_t table[N_BITS][3])
+void LED_Display::_createPinRCTable(uint8_t table[N_BITS][3]) const
 {
     for (uint8_t row = 0; row < N_BITS; row++)
     {

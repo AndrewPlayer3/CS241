@@ -117,10 +117,10 @@ struct LED_Display
          * 2. If hardware, the pin is given; else the left shift amount is given (position from the right in rc_s).
          * 3. The rc value for that bit position.
         /*/
-        void _createPinRCTable(uint8_t table[N_BITS][3]);
+        void _createPinRCTable(uint8_t table[N_BITS][3]) const;
 
         // Constructs the pattern array by reference from the pixel array.
-        void _createPatternArray(LED_rc_bits_t patterns[N_PIXELS * 2]);
+        void _createPatternArray(LED_rc_bits_t patterns[N_PIXELS * 2]) const;
 
         // Send one byte of data to the shift register and output it.
         void _sendByte(const uint8_t& data) const;
