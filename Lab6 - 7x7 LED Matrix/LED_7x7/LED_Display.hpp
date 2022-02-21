@@ -84,8 +84,10 @@ struct LED_Display
 
         uint8_t hard_wire_pins[n_hard_wire_pins];
  
-        LED_rc_bits_t patterns[n_pixels * 2];
+        LED_rc_bits_t patterns[n_pixels    ];
         uint8_t       pixels  [n_pixels    ];
+
+        uint8_t outputs[n_pixels * 2][3];
 
         uint8_t hard_wire_rc  [n_hard_wire_bits] = {R4, R6, C1, C2, R7, C4, R5, R2};
         uint8_t shift_rc      [n_shift_bits    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
@@ -113,6 +115,8 @@ struct LED_Display
 
         // Sets the pin mode for all pins to OUTPUT
         void setPinModes() const;
+
+        void setOutputArray();
 
         // Send one byte of data to the shift register and output it.
         void sendByte(const uint8_t& data) const;
@@ -156,8 +160,8 @@ struct LED_Display
 
         // This flips the configuration so that it will work with the shift_reg on the Row 4 side.
         void flipSetup();
-        
-        
+
+
         /* --- Output Member Functions --- */
 
         // Serial Print the Pattern Values that are being read.
@@ -165,9 +169,6 @@ struct LED_Display
         
         // Serial Print the Pixel Values that are being read.
         void printPixels  () const;
-
-        // Shows a single byte pattern (used by drawPixels to show rows, but it can show anything).
-        void showPattern(const LED_rc_bits_t& pattern) const;
 
         // Draw the pixel array onto the LED Matrix.
         void drawDisplay  () const;

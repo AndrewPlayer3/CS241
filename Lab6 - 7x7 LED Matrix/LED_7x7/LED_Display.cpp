@@ -45,8 +45,8 @@ void LED_Display::init(const uint8_t shift_pin_array    [n_shift_pins    ],
 {
     setPins(shift_pin_array, hard_wire_pin_array);
     setPinModes();
-    setPixels(pixel_drawing);
     setIsHardwiredPinAndRcAtBit();
+    setPixels(pixel_drawing);
 }
 
 
@@ -80,21 +80,16 @@ void LED_Display::setPixels(const uint8_t pixel_drawing[n_pixels])
     }
 
     setPatternArray();
+    setOutputArray();
 }
 
 
 void LED_Display::setPatternArray() 
 {
-    // Blank out between frames for less glitchiness.
-    for (uint8_t row = 1; row < n_pixels * 2; row += 2)
-    {
-        patterns[row] = 0b1111111100000000;
-    }
-
     uint8_t placement = 0;
 
     // Go through each uint8_t pixel row and generate a LED_rc_bits_t pattern row
-    for (int8_t row = n_pixels - 1; row >= 0; row--)
+    for (int8_t row = n_pixels - 1; row >= 0; row--) // Going backwards makes sure the image is oriented correctly.
     { 
         LED_rc_bits_t pattern_row = 0b1111111100000000;
  
@@ -111,9 +106,45 @@ void LED_Display::setPatternArray()
                 pattern_row |=   0b1 << col;         // Col Bit
             }
         }
-        patterns[placement * 2] = pattern_row;
+
+        patterns[placement] = pattern_row;
+
         placement++;
     }
+}
+
+
+void LED_Display::setOutputArray() 
+{
+  for (uint8_t i = 0; i < n_pixels * 2; i++)
+  {
+      uint8_t shift  = 0b00000000; // This value gets sent to sendByte for the shift register
+      uint8_t port_b = 0b00000000; // This value gets sent to PORTB
+      uint8_t port_d = 0b00000000; // This value gets sent to PORTD
+
+      uint16_t  pattern;
+      if (i % 2 == 0) pattern = patterns[(uint8_t)(i / 2)];
+      else            pattern = 0b1111111100000000;
+  
+      for (uint8_t rc = 0; rc < 16; rc++)
+      {
+          const bool&    is_shift = !is_hardwired_pin_and_rc_at_bit[rc][0];
+          const uint8_t& pin      =  is_hardwired_pin_and_rc_at_bit[rc][1];  
+          const uint8_t& rc_val   =  is_hardwired_pin_and_rc_at_bit[rc][2];
+  
+          const bool bit  = 1 & (pattern >> rc_val);  // Get the bit at the row/column offset in the pattern.
+  
+          /* Place the bit in the correct position */
+          if (is_shift){shift  ^=  (bit << (pin)); continue;}
+  
+          if (pin < 8)  port_d += ~(port_d) & (bit << (pin    ));  // This is equivalent to _ ^= (bit << pin) here,
+          else          port_b += ~(port_d) & (bit << (pin % 8));  // but this ends up faster.
+      }
+
+      outputs[i][0] = port_b;
+      outputs[i][1] = port_d;
+      outputs[i][2] = shift ;
+  }
 }
 
 
@@ -178,7 +209,7 @@ void LED_Display::flipSetup()
 {
     if (n_hard_wire_bits != n_shift_bits)
     {
-        Serial.println("ARRAY SIZES DONT MATCH FOR SWAPRC!");
+        Serial.println("ARRAY SIZES DONT MATCH FOR FLIPSETUP!");
         return;
     }
 
@@ -204,6 +235,7 @@ void LED_Display::flipSetup()
     }
 
     setIsHardwiredPinAndRcAtBit();
+    setOutputArray();
 }
 
 
@@ -224,48 +256,20 @@ void LED_Display::sendByte(const uint8_t& data) const
 }
 
 
-void LED_Display::showPattern(const LED_rc_bits_t& pattern) const 
-{
-    uint8_t shift  = 0b00000000; // This value gets sent to sendByte for the shift register
-    uint8_t port_b = 0b00000000; // This value gets sent to PORTB
-    uint8_t port_d = 0b00000000; // This value gets sent to PORTD
-
-    for (uint8_t rc = 0; rc < 16; rc++)
-    {
-        const bool&    is_shift = !is_hardwired_pin_and_rc_at_bit[rc][0];
-        const uint8_t& pin      =  is_hardwired_pin_and_rc_at_bit[rc][1];  
-        const uint8_t& rc_val   =  is_hardwired_pin_and_rc_at_bit[rc][2];
-
-        const bool bit  = 1 & (pattern >> rc_val);  // Get the bit at the row/column offset in the pattern.
-
-        /* Place the bit in the correct position */
-        if (is_shift){shift  ^=  (bit << (pin)); continue;}
-
-        if (pin < 8)  port_d += ~(port_d) & (bit << (pin    ));  // This is equivalent to _ ^= (bit << pin),
-        else          port_b += ~(port_d) & (bit << (pin % 8));  // but this is faster here.
-    }
-
-    PORTB = port_b ;
-    PORTD = port_d ;
-    sendByte(shift);
-}
-
-
 void LED_Display::drawDisplay() const
 {
-    for (uint8_t row = 0; row < n_pixels * 2; row++) 
+    for (uint8_t i = 0; i < n_pixels * 2; i++)
     {
-        showPattern(patterns[row]);
+        sendByte(outputs[i][2]);
+        PORTD =  outputs[i][1] ;
+        PORTB =  outputs[i][0] ;
     }
 }
 
 
 void LED_Display::drawDisplay(const uint32_t& microseconds) const
 {
-    for (uint8_t row = 0; row < n_pixels * 2; row++) 
-    {
-        showPattern(patterns[row]);
-    }
+    drawDisplay();
     delayMicroseconds(microseconds);
 }
 
