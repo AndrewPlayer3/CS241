@@ -15,34 +15,77 @@ const uint8_t hard_wire_pins[N_HARD_WIRE_PINS] = {12, 11, 10, 9, 8, 7, 6, 5    }
                                     /*  Default:  R4, ...,                R2                                         */
                                     /*  Else:     R0, ...,                C7 and add display.flipSetup() in setup(). */
 
-/*/
- * ⚠ Put here whatever you want to display!!! :) ⚠
- * ⚠ 1 means the respective pixel will be ON     ⚠
- * ⚠ 0 means the respective pixel will be OFF    ⚠
-/*/
-const uint8_t pixel_drawing[N_PIXELS] = 
-{
-    0b11000011,
-    0b00000000,
-    0b01100110,
-    0b01100110,
-    0b00000000,
-    0b01111110,
-    0b01000010,
-    0b00111100
-};
-
 LED_Display display;
+
+/*/
+ * ⚠ Each row in the sub-arrays represent leds 0 -> 7 on the display :)
+ * ⚠ 1 means the respective pixel will be ON                           
+ * ⚠ 0 means the respective pixel will be OFF
+/*/
+const uint8_t pixel_drawing_frames[5][N_PIXELS] = 
+{    
+    {
+        0b11000011,
+        0b00000000,
+        0b01100110,
+        0b01100110,
+        0b00000000,
+        0b01111110,
+        0b01000010,
+        0b00111100
+    },
+    {
+        0b11000011,
+        0b00000000,
+        0b01100110,
+        0b01100110,
+        0b00000000,
+        0b00111100,
+        0b00100100,
+        0b00011000
+    },
+    {
+        0b11000011,
+        0b00000000,
+        0b01100110,
+        0b01100110,
+        0b00000000,
+        0b00111100,
+        0b00111100,
+        0b00000000
+    },
+    {
+        0b11000011,
+        0b00000000,
+        0b01100110,
+        0b01100110,
+        0b00000000,
+        0b00111100,
+        0b00100100,
+        0b00011000
+    },
+    {
+        0b11000011,
+        0b00000000,
+        0b01100110,
+        0b01100110,
+        0b00000000,
+        0b00111100,
+        0b00100100,
+        0b00011000
+    },
+};
 
 void setup()
 {
     Serial.begin(115200);
     Serial.println("Serial Activated!");
-    display.init(shift_pins, hard_wire_pins, pixel_drawing);
+    display.init(shift_pins, hard_wire_pins, pixel_drawing_frames[0]);
 }
 
 int counter    = 0;
 int iterations = 1000;
+int frame = 0;
 
 unsigned long draw_time  = 0;
 
@@ -72,6 +115,9 @@ void loop()
 
       draw_time = 0;
       counter   = 0;
+
+      frame += 1;
+      display.setPixels(pixel_drawing_frames[frame % 4]);
     }
 
     else counter++;
