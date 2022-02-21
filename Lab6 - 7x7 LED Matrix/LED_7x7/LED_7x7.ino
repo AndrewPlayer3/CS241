@@ -52,9 +52,9 @@ void loop()
 {
     unsigned long start_t = micros();
 
-    /* -------------------- */
-    display.drawDisplay();   // You can optionally add a delay in microseconds (as uint32_t) as a parameter.
-    /* -------------------- */
+    ///////////////////////////
+    display.drawDisplay();   // You can optionally add a delay in microseconds (uint32_t) as a parameter.
+    ///////////////////////////
 
     unsigned long end_t   = micros();
 
