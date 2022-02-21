@@ -56,7 +56,7 @@ enum : uint8_t
  * 
  *  hard_wire_pins: uint8_t[#hard_wired_pins (8)]
  *    - This array should contain the pin numbers as they correspond to this order: {R4, R6, C1, C2, R7, C4, R5, R2} if default.
- *                                                                           or {R0, C3, C5, R3, C0, R1, C6, C7} if using flipSetup().
+ *                                                                                  {R0, C3, C5, R3, C0, R1, C6, C7} if using flipSetup().
  * 
  *  pixel_drawing: uint8_t[#pixels (8)]
  *    - This array contains an array of binary numbers, 1 8-bit number for each row.
