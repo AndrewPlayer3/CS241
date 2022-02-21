@@ -24,7 +24,7 @@ const uint8_t hard_wire_pins[n_hard_wire_pins] = {12, 11, 10, 9, 8, 7, 6, 5    }
 /*/
 const uint8_t pixel_drawing[n_pixels] = 
 {
-    0b11100111,
+    0b11000011,
     0b00000000,
     0b01100110,
     0b01100110,
@@ -53,7 +53,7 @@ void loop()
     unsigned long start_t = micros();
 
     /* -------------------- */
-    display.drawDisplay();
+    display.drawDisplay();   // You can optionally add a delay in microseconds (as uint32_t) as a parameter.
     /* -------------------- */
 
     unsigned long end_t   = micros();
