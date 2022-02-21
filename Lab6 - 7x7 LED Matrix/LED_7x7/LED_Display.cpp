@@ -31,72 +31,73 @@ LED_Display::LED_Display()
 }
 
 
-LED_Display::LED_Display(const uint8_t shift_pin_array    [n_shift_pins    ],
-                         const uint8_t hard_wire_pin_array[n_hard_wire_pins],
-                         const uint8_t pixel_drawing      [n_pixels        ])
+LED_Display::LED_Display(const uint8_t shift_pin_array    [N_SHIFT_PINS    ],
+                         const uint8_t hard_wire_pin_array[N_HARD_WIRE_PINS],
+                         const uint8_t pixel_drawing      [N_PIXELS        ])
 {
     init(shift_pin_array, hard_wire_pin_array, pixel_drawing);
 }
 
 
-void LED_Display::init(const uint8_t shift_pin_array    [n_shift_pins    ],
-                       const uint8_t hard_wire_pin_array[n_hard_wire_pins],
-                       const uint8_t pixel_drawing      [n_pixels        ])
+void LED_Display::init(const uint8_t shift_pin_array    [N_SHIFT_PINS    ],
+                       const uint8_t hard_wire_pin_array[N_HARD_WIRE_PINS],
+                       const uint8_t pixel_drawing      [N_PIXELS        ])
 {
-    setPins(shift_pin_array, hard_wire_pin_array);
-    setPinModes();
-    setIsHardwiredPinAndRcAtBit();
+    _setPins(shift_pin_array, hard_wire_pin_array);
+    _setPinModes();
+
     setPixels(pixel_drawing);
 }
 
 
 LED_Display::~LED_Display()
 {
-  const uint8_t zeros[n_pixels] = {0, 0, 0, 0, 0, 0, 0, 0};
-  setPixels(zeros);
-  drawDisplay();
+    const uint8_t zeros[N_PIXELS] = {0, 0, 0, 0, 0, 0, 0, 0};
+  
+    setPixels(zeros);
+
+    drawDisplay();
 }
 
 
-void LED_Display::setPins(const uint8_t shift_pin_array    [n_shift_pins    ],
-                          const uint8_t hard_wire_pin_array[n_hard_wire_pins])
+void LED_Display::_setPins(const uint8_t shift_pin_array    [N_SHIFT_PINS    ],
+                           const uint8_t hard_wire_pin_array[N_HARD_WIRE_PINS])
 {
-    DATA_pin  = shift_pin_array[0];
-    SRCLK_pin = shift_pin_array[1];
-    RCLK_pin  = shift_pin_array[2];
+    _DATA_pin  = shift_pin_array[0];
+    _SRCLK_pin = shift_pin_array[1];
+    _RCLK_pin  = shift_pin_array[2];
 
-    for (uint8_t pin = 0; pin < n_hard_wire_pins; pin++) 
+    for (uint8_t pin = 0; pin < N_HARD_WIRE_PINS; pin++) 
     {
-        hard_wire_pins[pin] = hard_wire_pin_array[pin];
+        _hard_wire_pins[pin] = hard_wire_pin_array[pin];
     }
 }
 
 
-void LED_Display::setPixels(const uint8_t pixel_drawing[n_pixels])
+void LED_Display::setPixels(const uint8_t pixel_drawing[N_PIXELS])
 {
-    for (uint8_t pxl = 0; pxl < n_pixels; pxl++)
+    for (uint8_t pixel = 0; pixel < N_PIXELS; pixel++)
     {
-        pixels[pxl] = pixel_drawing[pxl];
+        _pixels[pixel] = pixel_drawing[pixel];
     }
 
-    setPatternArray();
-    setOutputArray();
+    _setOutputArray();
 }
 
 
-void LED_Display::setPatternArray() 
+void LED_Display::_createPatternArray(LED_rc_bits_t patterns[N_PIXELS * 2]) 
 {
     uint8_t placement = 0;
 
     // Go through each uint8_t pixel row and generate a LED_rc_bits_t pattern row
-    for (int8_t row = n_pixels - 1; row >= 0; row--) // Going backwards makes sure the image is oriented correctly.
+    for (int8_t row = N_PIXELS - 1; row >= 0; row--) // Going backwards makes sure the image is oriented correctly.
     { 
         LED_rc_bits_t pattern_row = 0b1111111100000000;
  
-        const uint8_t drawing_row = pixels[placement];
+        const uint8_t drawing_row = _pixels[placement];
         const uint8_t row_shift   = row + 8;
 
-        for (int8_t col = 0; col < n_pixels; col++)
+        for (int8_t col = 0; col < N_PIXELS; col++)
         {
             const uint8_t pixel = (drawing_row & (1 << col));
 
@@ -114,155 +115,146 @@ void LED_Display::setPatternArray()
 }
 
 
-void LED_Display::setOutputArray() 
+void LED_Display::_setOutputArray() 
 {
-  for (uint8_t i = 0; i < n_pixels * 2; i++)
-  {
-      uint8_t shift  = 0b00000000; // This value gets sent to sendByte for the shift register
-      uint8_t port_b = 0b00000000; // This value gets sent to PORTB
-      uint8_t port_d = 0b00000000; // This value gets sent to PORTD
 
-      uint16_t  pattern;
-      if (i % 2 == 0) pattern = patterns[(uint8_t)(i / 2)];
-      else            pattern = 0b1111111100000000;
-  
-      for (uint8_t rc = 0; rc < 16; rc++)
-      {
-          const bool&    is_shift = !is_hardwired_pin_and_rc_at_bit[rc][0];
-          const uint8_t& pin      =  is_hardwired_pin_and_rc_at_bit[rc][1];  
-          const uint8_t& rc_val   =  is_hardwired_pin_and_rc_at_bit[rc][2];
-  
-          const bool bit  = 1 & (pattern >> rc_val);  // Get the bit at the row/column offset in the pattern.
-  
-          /* Place the bit in the correct position */
-          if (is_shift){shift  ^=  (bit << (pin)); continue;}
-  
-          if (pin < 8)  port_d += ~(port_d) & (bit << (pin    ));  // This is equivalent to _ ^= (bit << pin) here,
-          else          port_b += ~(port_d) & (bit << (pin % 8));  // but this ends up faster.
-      }
+    uint8_t is_hardwired_pin_and_rc_at_bit[N_BITS][3];
 
-      outputs[i][0] = port_b;
-      outputs[i][1] = port_d;
-      outputs[i][2] = shift ;
-  }
+    _createPinRCTable(is_hardwired_pin_and_rc_at_bit);
+  
+    LED_rc_bits_t patterns[N_PIXELS * 2] = { 0 };
+
+    _createPatternArray(patterns);
+
+    for (uint8_t i = 0; i < N_PIXELS * 2; i++)
+    {
+        uint8_t shift  = 0b00000000; // This value gets sent to _sendByte for the shift register
+        uint8_t port_b = 0b00000000; // This value gets sent to PORTB
+        uint8_t port_d = 0b00000000; // This value gets sent to PORTD
+
+        uint16_t  pattern;
+
+        if (i % 2 == 0) pattern = patterns[(uint8_t)(i / 2)];
+        else            pattern = 0b1111111100000000;  // Blank out every other row.
+    
+        for (uint8_t rc = 0; rc < 16; rc++)
+        {
+            const bool&    is_shift = !is_hardwired_pin_and_rc_at_bit[rc][0];
+            const uint8_t& pin      =  is_hardwired_pin_and_rc_at_bit[rc][1];  
+            const uint8_t& rc_val   =  is_hardwired_pin_and_rc_at_bit[rc][2];
+
+            const bool bit  = 1 & (pattern >> rc_val);  // Get the bit at the row/column offset in the pattern.
+
+            /* Place the bit in the correct position */
+            if (is_shift)      shift  ^= (bit << (pin    ));
+            else if (pin < 8)  port_d ^= (bit << (pin    ));
+            else               port_b ^= (bit << (pin % 8));
+        }
+
+        _outputs[i][0] = port_b;
+        _outputs[i][1] = port_d;
+        _outputs[i][2] = shift ;
+    }
 }
 
 
-void LED_Display::setPinModes() const
+void LED_Display::_setPinModes() const
 {
-    for (const uint8_t hard_wired_pin : hard_wire_pins) 
+    for (const uint8_t hard_wired_pin : _hard_wire_pins) 
     {
         pinMode(hard_wired_pin, OUTPUT);
     }
 
-    pinMode(RCLK_pin, OUTPUT);
-    PICKPORTANDWRITE0(RCLK_pin);
+    pinMode(_RCLK_pin, OUTPUT);
+    PICKPORTANDWRITE0(_RCLK_pin);
 
-    pinMode(SRCLK_pin, OUTPUT);
-    PICKPORTANDWRITE0(SRCLK_pin);
+    pinMode(_SRCLK_pin, OUTPUT);
+    PICKPORTANDWRITE0(_SRCLK_pin);
 
-    pinMode(DATA_pin, OUTPUT);
-    PICKPORTANDWRITE0(DATA_pin);
+    pinMode(_DATA_pin, OUTPUT);
+    PICKPORTANDWRITE0(_DATA_pin);
 }
 
 
-void LED_Display::setIsHardwiredPinAndRcAtBit()
+void LED_Display::_createPinRCTable(uint8_t table[N_BITS][3])
 {
-    for (uint8_t row = 0; row < n_bits; row++)
+    for (uint8_t row = 0; row < N_BITS; row++)
     {
-        for (uint8_t col = 0; col < n_hard_wire_bits; col++)
+        for (uint8_t col = 0; col < N_HARD_WIRE_BITS; col++)
         {
-            if (row == hard_wire_rc[col])
+            if (row == _hard_wire_rc[col])
             { 
-                is_hardwired_pin_and_rc_at_bit[row][0] = true;
-                is_hardwired_pin_and_rc_at_bit[row][1] = hard_wire_pins[col];
-                is_hardwired_pin_and_rc_at_bit[row][2] = row;
+                table[row][0] = true;
+                table[row][1] = _hard_wire_pins[col];
+                table[row][2] = row;
                 break;
             }
-            if (row == shift_rc[col])
+            if (row == _shift_rc[col])
             {
-                is_hardwired_pin_and_rc_at_bit[row][0] = false;
-                is_hardwired_pin_and_rc_at_bit[row][1] = shift_offsets[col];
-                is_hardwired_pin_and_rc_at_bit[row][2] = row;
+                table[row][0] = false;
+                table[row][1] = _shift_offsets[col];
+                table[row][2] = row;
                 break;
             }
         }
     }
-}
-
-
-uint8_t LED_Display::getPatternRow(const uint8_t& pattern_row) const
-{
-    if (pattern_row > n_pixels * 2 - 1) return 0;
-    return pixels[pattern_row];
-}
-
-
-uint8_t LED_Display::getPixelRow(const uint8_t& pixel_row) const
-{
-    if (pixel_row > n_pixels - 1) return 0;
-    return pixels[pixel_row];
 }
 
 
 void LED_Display::flipSetup()
 {
-    if (n_hard_wire_bits != n_shift_bits)
+    if (N_HARD_WIRE_BITS != N_SHIFT_BITS)
     {
         Serial.println("ARRAY SIZES DONT MATCH FOR FLIPSETUP!");
         return;
     }
 
-    uint8_t back = n_hard_wire_bits - 1;
+    uint8_t back = N_HARD_WIRE_BITS - 1;
 
-    for (uint8_t index = 0; index < n_hard_wire_bits; index++)
+    for (uint8_t index = 0; index < N_HARD_WIRE_BITS; index++)
     {
-        const uint8_t h_temp = hard_wire_rc[index];
-        const uint8_t s_temp = shift_rc    [index];
+        const uint8_t h_temp = _hard_wire_rc[index];
+        const uint8_t s_temp = _shift_rc    [index];
 
-        hard_wire_rc[index]  = s_temp;
-        shift_rc    [index]  = h_temp;
+        _hard_wire_rc[index]  = s_temp;
+        _shift_rc    [index]  = h_temp;
 
         if(index < back)
         {
-            const uint8_t o_temp = shift_offsets[index];
+            const uint8_t o_temp = _shift_offsets[index];
 
-            shift_offsets[index] = shift_offsets[back ];
-            shift_offsets[back ] = o_temp;
+            _shift_offsets[index] = _shift_offsets[back ];
+            _shift_offsets[back ] = o_temp;
         }
  
         back--;
     }
 
-    setIsHardwiredPinAndRcAtBit();
-    setOutputArray();
+    _setOutputArray();
 }
 
 
-void LED_Display::sendByte(const uint8_t& data) const 
+void LED_Display::_sendByte(const uint8_t& data) const 
 {
     for (uint8_t bit = 0; bit < 8; bit++) 
     {
-        if (data & (1 << bit)) {PICKPORTANDWRITE1(DATA_pin);}
-        else                   {PICKPORTANDWRITE0(DATA_pin);}
+        if (data & (1 << bit)) {PICKPORTANDWRITE1(_DATA_pin);}
+        else                   {PICKPORTANDWRITE0(_DATA_pin);}
 
-       /* Fun fact: If I assume that this goes to Port D, and replace this with PORTDWRITE1 and PORTDWRITE0,
-        *           along with the similar calls above and below, it is actually consistantly significantly slower. 
-        */
-        CLOCKPULSE(SRCLK_pin);
+        CLOCKPULSE(_SRCLK_pin);
     }
 
-    CLOCKPULSE(RCLK_pin);
+    CLOCKPULSE(_RCLK_pin);
 }
 
 
 void LED_Display::drawDisplay() const
 {
-    for (uint8_t i = 0; i < n_pixels * 2; i++)
+    for (uint8_t i = 0; i < N_PIXELS * 2; i++)
     {
-        sendByte(outputs[i][2]);
-        PORTD =  outputs[i][1] ;
-        PORTB =  outputs[i][0] ;
+        _sendByte(_outputs[i][2]);
+        PORTD =   _outputs[i][1] ;
+        PORTB =   _outputs[i][0] ;
     }
 }
 
@@ -271,30 +263,4 @@ void LED_Display::drawDisplay(const uint32_t& microseconds) const
 {
     drawDisplay();
     delayMicroseconds(microseconds);
-}
-
-
-void LED_Display::printPixels() const
-{
-    for (uint8_t row = 0; row < n_pixels; row++)
-    {
-        Serial.print("PIXEL ");
-        Serial.print(row);
-        Serial.print(": ");
-        Serial.print(pixels[row]);
-        Serial.println(" ");
-    }
-}
-
-
-void LED_Display::printPatterns() const
-{
-    for (uint8_t row = 0; row < n_pixels * 2; row++)
-    {
-        Serial.print("PATTERN ");
-        Serial.print(row);
-        Serial.print(": ");
-        Serial.println(patterns[row]);
-        Serial.println(" ");
-    }
 }

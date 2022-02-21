@@ -15,12 +15,13 @@
 
 #include <stdint-gcc.h>
 
-#define n_shift_pins      3
-#define n_shift_bits      8
-#define n_hard_wire_pins  8
-#define n_hard_wire_bits  8
-#define n_pixels          8
-#define n_bits           16
+
+#define N_SHIFT_PINS      3
+#define N_SHIFT_BITS      8
+#define N_HARD_WIRE_PINS  8
+#define N_HARD_WIRE_BITS  8
+#define N_PIXELS          8
+#define N_BITS           16
 
 
 /* Patterns are just 16-Bit Unsigned  */
@@ -46,7 +47,7 @@ enum : uint8_t
  *  if not, you need to call the flipSetup() method after initiallizing the object.
  *  You do not need to call it more than once.
  * 
- *  The top of the display (the zeroth row of pixels) is the side of the display
+ *  The top of the display (the zeroth row of _pixels) is the side of the display
  *  with the model numbers printed on.
  * 
  * Construction Parameters:
@@ -54,7 +55,7 @@ enum : uint8_t
  *  shift_pins: uint8_t[#shift_register_pins (3)]
  *    - This array should contain the pin numbers in this order: DATA, SRCLK, RCHK.
  * 
- *  hard_wire_pins: uint8_t[#hard_wired_pins (8)]
+ *  _hard_wire_pins: uint8_t[#hard_wired_pins (8)]
  *    - This array should contain the pin numbers as they correspond to this order: {R4, R6, C1, C2, R7, C4, R5, R2} if default.
  *                                                                                  {R0, C3, C5, R3, C0, R1, C6, C7} if using flipSetup().
  * 
@@ -76,101 +77,93 @@ enum : uint8_t
 struct LED_Display 
 {
     private:
+        /* ---------------------------- */
         /* --- Private Data Members --- */
+        /* ---------------------------- */
 
-        uint8_t DATA_pin ;  // Data Pin
-        uint8_t SRCLK_pin;  // Shift Pin 
-        uint8_t RCLK_pin ;  // Output Pin
+        uint8_t _DATA_pin ;  // Data Pin
+        uint8_t _SRCLK_pin;  // Shift Pin 
+        uint8_t _RCLK_pin ;  // Output Pin
 
-        uint8_t hard_wire_pins[n_hard_wire_pins];
- 
-        LED_rc_bits_t patterns[n_pixels    ];
-        uint8_t       pixels  [n_pixels    ];
+        uint8_t _hard_wire_pins[N_HARD_WIRE_PINS];
 
-        uint8_t outputs[n_pixels * 2][3];
+        uint8_t _hard_wire_rc  [N_HARD_WIRE_BITS] = {R4, R6, C1, C2, R7, C4, R5, R2};
+        uint8_t _shift_rc      [N_SHIFT_BITS    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
+        uint8_t _shift_offsets [N_SHIFT_BITS    ] = { 7,  6,  5,  4,  3,  2,  1,  0};
 
-        uint8_t hard_wire_rc  [n_hard_wire_bits] = {R4, R6, C1, C2, R7, C4, R5, R2};
-        uint8_t shift_rc      [n_shift_bits    ] = {C7, C6, R1, C0, R3, C5, C3, R0};
-        uint8_t shift_offsets [n_shift_bits    ] = { 7,  6,  5,  4,  3,  2,  1,  0};
+        uint8_t _pixels [N_PIXELS    ]   ;
+        uint8_t _outputs[N_PIXELS * 2][3];
 
-        /*/
-        * Table for getting three things:
-        * 1. If a bit position value goes to a hardware pin, or not.
-        * 2. If hardware, the pin is given; else the left shift amount is given (position from the right in rc_s).
-        * 3. The rc value for that bit position.
-        /*/
-        uint8_t is_hardwired_pin_and_rc_at_bit[n_bits][3];
- 
-
+        /* --------------- */
         /* --- Setters --- */
+        /* --------------- */
 
         // Set the values of the pins
-        void setPins(const uint8_t shift_pins[n_shift_pins], const uint8_t hard_wire_pins[n_hard_wire_pins]);
- 
-        // Setup the is_hardwired_pin_and_rc_at_bit table.
-        void setIsHardwiredPinAndRcAtBit();
-
-        // Constructs the pattern array from the pixel array.
-        void setPatternArray();
+        void _setPins(const uint8_t shift_pins[N_SHIFT_PINS], const uint8_t hard_wire_pins[N_HARD_WIRE_PINS]);
 
         // Constructs the output pieces from the pattern array.
-        void setOutputArray();
+        void _setOutputArray();
 
         // Sets the pin mode for all pins to OUTPUT
-        void setPinModes() const;
+        void _setPinModes() const;
+
+        /* ------------- */
+        /* --- Misc. --- */
+        /* ------------- */
+
+        /*/
+         * Creates table by reference for getting three things:
+         * 1. If a bit position value goes to a hardware pin, or not.
+         * 2. If hardware, the pin is given; else the left shift amount is given (position from the right in rc_s).
+         * 3. The rc value for that bit position.
+        /*/
+        void _createPinRCTable(uint8_t table[N_BITS][3]);
+
+        // Constructs the pattern array by reference from the pixel array.
+        void _createPatternArray(LED_rc_bits_t patterns[N_PIXELS * 2]);
 
         // Send one byte of data to the shift register and output it.
-        void sendByte(const uint8_t& data) const;
+        void _sendByte(const uint8_t& data) const;
 
     public:
- 
+        /* -------------------- */
         /* --- Constructors --- */
+        /* -------------------- */
 
         // Default Constructor
         LED_Display();
 
         // Value Constructor 
-        LED_Display(const uint8_t shift_pins   [n_shift_pins    ],
-                    const uint8_t hardware_pins[n_hard_wire_pins],
-                    const uint8_t pixel_drawing[n_pixels        ]);
+        LED_Display(const uint8_t shift_pins   [N_SHIFT_PINS    ],
+                    const uint8_t hardware_pins[N_HARD_WIRE_PINS],
+                    const uint8_t pixel_drawing[N_PIXELS        ]);
 
         // Init method for use with default constructor
-        void init(const uint8_t shift_pins   [n_shift_pins    ],
-                  const uint8_t hardware_pins[n_hard_wire_pins],
-                  const uint8_t pixel_drawing[n_pixels        ]);
+        void init(const uint8_t shift_pins   [N_SHIFT_PINS    ],
+                  const uint8_t hardware_pins[N_HARD_WIRE_PINS],
+                  const uint8_t pixel_drawing[N_PIXELS        ]);
 
+        // Destructor just clears the display.
         ~LED_Display();
 
-        
+        /* ------------------- */
         /* --- Main Setter --- */
-        
+        /* ------------------- */
+
         // Set the values in the pixel array
-        void setPixels(const uint8_t pixel_drawing[n_pixels]);
+        void setPixels(const uint8_t pixel_drawing[N_PIXELS]);
 
-
-        /* --- Getters --- */
-
-        // Return the pattern bits at pattern_row (returns NULL if out of bounds.)
-        uint8_t getPatternRow(const uint8_t& pattern_row) const;
-
-        // Return the row of pixel bits at pixel_row (returns NULL if out of bounds.)
-        uint8_t getPixelRow(const uint8_t& pixel_row) const;
-
-
-        /* --- Mutators --- */
+        /* ------------------ */
+        /* --- Translator --- */
+        /* ------------------ */
 
         // This flips the configuration so that it will work with the shift_reg on the Row 4 side.
         void flipSetup();
 
-
+        /* ------------------------------- */
         /* --- Output Member Functions --- */
-
-        // Serial Print the Pattern Values that are being read.
-        void printPatterns() const;
+        /* ------------------------------- */
         
-        // Serial Print the Pixel Values that are being read.
-        void printPixels  () const;
-
         // Draw the pixel array onto the LED Matrix.
         void drawDisplay  () const;
 

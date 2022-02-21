@@ -12,8 +12,8 @@
 #define RCLK_PIN  3  // -- ⚠ Change me if different :D ⚠
 #define DATA_PIN  4  // -- ⚠ Change me if different :D ⚠
 
-const uint8_t shift_pins    [n_shift_pins    ] = {DATA_PIN, SRCLK_PIN, RCLK_PIN}; 
-const uint8_t hard_wire_pins[n_hard_wire_pins] = {12, 11, 10, 9, 8, 7, 6, 5    };  // ⚠ Change me if different :D ⚠
+const uint8_t shift_pins    [N_SHIFT_PINS    ] = {DATA_PIN, SRCLK_PIN, RCLK_PIN}; 
+const uint8_t hard_wire_pins[N_HARD_WIRE_PINS] = {12, 11, 10, 9, 8, 7, 6, 5    };  // ⚠ Change me if different :D ⚠
                                     /*  Default:  R4, ...,                R2                                         */
                                     /*  Else:     R0, ...,                C7 and add display.flipSetup() in setup(). */
 
@@ -22,7 +22,7 @@ const uint8_t hard_wire_pins[n_hard_wire_pins] = {12, 11, 10, 9, 8, 7, 6, 5    }
  * ⚠ 1 means the respective pixel will be ON     ⚠
  * ⚠ 0 means the respective pixel will be OFF    ⚠
 /*/
-const uint8_t pixel_drawing[n_pixels] = 
+const uint8_t pixel_drawing[N_PIXELS] = 
 {
     0b11000011,
     0b00000000,
