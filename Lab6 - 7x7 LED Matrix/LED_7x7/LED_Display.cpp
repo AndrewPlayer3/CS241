@@ -65,7 +65,7 @@ void LED_Display::setPins(const uint8_t shift_pin_array    [n_shift_pins    ],
 {
     DATA_pin  = shift_pin_array[0];
     SRCLK_pin = shift_pin_array[1];
-    RCHK_pin  = shift_pin_array[2];
+    RCLK_pin  = shift_pin_array[2];
 
     for (uint8_t pin = 0; pin < n_hard_wire_pins; pin++) 
     {
@@ -125,8 +125,8 @@ void LED_Display::setPinModes() const
         pinMode(hard_wired_pin, OUTPUT);
     }
 
-    pinMode(RCHK_pin, OUTPUT);
-    PICKPORTANDWRITE0(RCHK_pin);
+    pinMode(RCLK_pin, OUTPUT);
+    PICKPORTANDWRITE0(RCLK_pin);
 
     pinMode(SRCLK_pin, OUTPUT);
     PICKPORTANDWRITE0(SRCLK_pin);
@@ -221,7 +221,7 @@ void LED_Display::sendByte(const uint8_t& data) const
         CLOCKPULSE(SRCLK_pin); 
     }
 
-    CLOCKPULSE(RCHK_pin);
+    CLOCKPULSE(RCLK_pin);
 }
 
 

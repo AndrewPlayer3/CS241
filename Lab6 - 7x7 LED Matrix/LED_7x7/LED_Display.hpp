@@ -77,7 +77,7 @@ struct LED_Display
 
         uint8_t DATA_pin ;  // Data Pin
         uint8_t SRCLK_pin;  // Shift Pin 
-        uint8_t RCHK_pin ;  // Output Pin
+        uint8_t RCLK_pin ;  // Output Pin
 
         uint8_t hard_wire_pins[n_hard_wire_pins];
  

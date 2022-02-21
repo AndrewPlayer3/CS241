@@ -9,10 +9,10 @@
 #include "LED_Display.hpp"
 
 #define SRCLK_PIN 2  // -- ⚠ Change me if different :D ⚠
-#define RCHK_PIN  3  // -- ⚠ Change me if different :D ⚠
+#define RCLK_PIN  3  // -- ⚠ Change me if different :D ⚠
 #define DATA_PIN  4  // -- ⚠ Change me if different :D ⚠
 
-const uint8_t shift_pins    [n_shift_pins    ] = {DATA_PIN, SRCLK_PIN, RCHK_PIN}; 
+const uint8_t shift_pins    [n_shift_pins    ] = {DATA_PIN, SRCLK_PIN, RCLK_PIN}; 
 const uint8_t hard_wire_pins[n_hard_wire_pins] = {12, 11, 10, 9, 8, 7, 6, 5    };  // ⚠ Change me if different :D ⚠
                                     /*  Default:  R4, ...,                R2                                         */
                                     /*  Else:     R0, ...,                C7 and add display.flipSetup() in setup(). */
