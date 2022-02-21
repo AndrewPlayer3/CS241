@@ -163,14 +163,14 @@ void LED_Display::setIsHardwiredPinAndRcAtBit()
 
 uint8_t LED_Display::getPatternRow(const uint8_t& pattern_row) const
 {
-    if (pattern_row > n_pixels * 2 - 1) return NULL;
+    if (pattern_row > n_pixels * 2 - 1) return 0;
     return pixels[pattern_row];
 }
 
 
 uint8_t LED_Display::getPixelRow(const uint8_t& pixel_row) const
 {
-    if (pixel_row > n_pixels - 1) return NULL;
+    if (pixel_row > n_pixels - 1) return 0;
     return pixels[pixel_row];
 }
 
