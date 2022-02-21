@@ -1,9 +1,7 @@
 /*/
- * Print Patterns on 8x8 LED Display
+ * Print Patterns on a 1588AS 8x8 LED Display
  * Andrew Player
  * 2022
- * 
- * Simple 8x8 LED Matrix Drawing program.
 /*/
 
 #include "LED_Display.hpp"

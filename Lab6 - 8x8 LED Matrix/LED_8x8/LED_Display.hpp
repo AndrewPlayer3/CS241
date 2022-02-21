@@ -1,5 +1,5 @@
 /*/
- * Library for Displaying Patterns on 74HC595 8x8 LED Display
+ * Library for Displaying Patterns on a 1588AS 8x8 LED Display
  * with a 74HC595 shift regesiter.
  * Andrew Player
  * 2022
