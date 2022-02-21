@@ -38,35 +38,33 @@ enum : uint8_t
 
 
 /*
- * LED_Display
- *
- * @Description:
- * -------------
  * This struct contains everything for drawing on a 1588AS 8x8 LED Dislpay with a 74HC595 shift register.
  * 
- * @Notes:
+ * Notes:
  * ------
- * By default it is assumed that the hard-wired side is the side with Row 4,
- * if not, you need to call the flipSetup() method after initiallizing the object.
- * You do not need to call it more than once.
+ *  By default it is assumed that the hard-wired side is the side with Row 4,
+ *  if not, you need to call the flipSetup() method after initiallizing the object.
+ *  You do not need to call it more than once.
  * 
- * The top of the display (the zeroth row of pixels) is the side of the display
- * with the model numbers printed on.
+ *  The top of the display (the zeroth row of pixels) is the side of the display
+ *  with the model numbers printed on.
  * 
- * @Params:
- * --------
- * shift_pins: uint8_t[#shift_register_pins (3)]
- *  This array should contain the pin numbers in this order: DATA, SRCLK, RCHK.
+ * Construction Parameters:
+ * ------------------------
+ *  shift_pins: uint8_t[#shift_register_pins (3)]
+ *    - This array should contain the pin numbers in this order: DATA, SRCLK, RCHK.
  * 
- * hard_wire_pins: uint8_t[#hard_wired_pins (8)]
- *  This array should contain the pin numbers as they correspond to this order: {R4, R6, C1, C2, R7, C4, R5, R2} if default.
+ *  hard_wire_pins: uint8_t[#hard_wired_pins (8)]
+ *    - This array should contain the pin numbers as they correspond to this order: {R4, R6, C1, C2, R7, C4, R5, R2} if default.
  *                                                                           or {R0, C3, C5, R3, C0, R1, C6, C7} if using flipSetup().
- * pixel_drawing: uint8_t[#pixels (8)]
- *  This array contains an array of binary numbers, 1 8-bit number for each row.
- *  Each digit in the binary number represents the respective pixel. 0's are off, 1's are on.
+ * 
+ *  pixel_drawing: uint8_t[#pixels (8)]
+ *    - This array contains an array of binary numbers, 1 8-bit number for each row.
+ *      Each digit in the binary number represents the respective pixel. 0's are off, 1's are on.
+ * 
  *      Diagonal Line Example: {
  *                              0b10000000,  ON OFF OFF OFF OFF OFF OFF OFF
- *                              0b01000000,  OFF ON ...                 OFF
+ *                              0b01000000,  OFF ON ... ... ... ... ... OFF
  *                              0b00100000,  ...
  *                              0b00010000,  ...
  *                              0b00001000,  ...
